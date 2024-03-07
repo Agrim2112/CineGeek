@@ -5,7 +5,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/blue"
-    tools:context=".LoginActivity">
+    tools:context=".SignUpActivity">
+
+    <!--    <ImageView-->
+    <!--        android:id="@+id/ivLoginCover"-->
+    <!--        android:layout_width="290dp"-->
+    <!--        android:layout_height="210dp"-->
+    <!--        android:layout_marginTop="20dp"-->
+    <!--        android:layout_marginStart="20dp"-->
+    <!--        android:layout_marginEnd="20dp"-->
+    <!--        android:src="@drawable/logincover"-->
+    <!--        android:scaleType="fitXY"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+    <!--    <LinearLayout-->
+    <!--        android:id="@+id/linearLayout"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:orientation="vertical"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent">-->
+
+    <!--        <androidx.constraintlayout.widget.ConstraintLayout-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="match_parent">-->
+
+    <!--            <ImageView-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="100dp"-->
+    <!--                android:scaleType="centerCrop"-->
+    <!--                android:src="@drawable/gradient_bg"-->
+    <!--                app:layout_constraintEnd_toEndOf="parent"-->
+    <!--                app:layout_constraintStart_toStartOf="parent"-->
+    <!--                tools:layout_editor_absoluteY="200dp" />-->
+    <!--        </androidx.constraintlayout.widget.ConstraintLayout>-->
+    <!--    </LinearLayout>-->
 
     <TextView
         android:id="@+id/tvLogin"
@@ -15,7 +51,7 @@
         android:layout_marginTop="176dp"
         android:layout_marginEnd="30dp"
         android:fontFamily="@font/nunito_sans_bold"
-        android:text="Login"
+        android:text="Sign Up"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="38sp"
@@ -65,35 +101,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etUsername" />
 
-    <TextView
-        android:id="@+id/tvForgotPwd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="35dp"
-        android:layout_marginTop="20dp"
-        android:text="Forgot Password?"
-        android:textColor="@color/orange"
-        android:fontFamily="@font/cabin_semibold"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etPassword" />
-
     <Button
         android:id="@+id/btnLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
-        android:layout_marginTop="100dp"
         android:layout_marginEnd="30dp"
         android:background="@drawable/button_bg"
         android:fontFamily="@font/lato_black"
-        android:text="Login"
+        android:text="Sign UP"
         android:textColor="@color/white"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvForgotPwd" />
+        tools:layout_editor_absoluteY="559dp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -109,7 +131,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/cabin_semibold"
-            android:text="Don't have an account?"
+            android:text="Already have an account?"
             android:textColor="@color/white"
             android:textSize="16sp" />
 
@@ -119,7 +141,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:fontFamily="@font/cabin_semibold"
-            android:text="Sign Up"
+            android:text="Login"
             android:textColor="@color/orange"
             android:textSize="16sp"
             android:textStyle="bold" />
