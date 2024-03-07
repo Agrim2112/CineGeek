@@ -32,8 +32,9 @@
         android:background="@drawable/edittext_bg"
         android:boxstrokecolor="#C5C5C5"
         android:drawableLeft="@drawable/user"
+        android:drawablePadding="8dp"
         android:fontFamily="@font/cabin_semibold"
-        android:hint="  Username"
+        android:hint="Username"
         android:inputType="text"
         android:minHeight="48dp"
         android:paddingStart="15dp"
@@ -54,8 +55,9 @@
         android:layout_marginTop="20dp"
         android:paddingStart="15dp"
         android:drawableLeft="@drawable/padlock"
+        android:drawablePadding="8dp"
         android:fontFamily="@font/cabin_semibold"
-        android:hint="  Password"
+        android:hint="Password"
         android:inputType="textPassword"
         android:passwordtoggleEnabled="true"
         android:minHeight="48dp"
@@ -78,7 +80,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etPassword" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
