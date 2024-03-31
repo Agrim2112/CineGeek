@@ -1,6 +1,7 @@
 package com.example.cinegeek
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -39,11 +40,9 @@ class MovieAdapter(private val context: Context, private val MoviesList: Mutable
 
 
         holder.itemView.setOnClickListener{
-//            if(){
-//            }
-//            else
-//            {
-//            }
+            val intent= Intent(context,DetailsActivity::class.java)
+            intent.putExtra("movieId",model.id.toString())
+            context.startActivity(intent)
         }
     }
 

@@ -31,29 +31,43 @@ class DashboardActivity : AppCompatActivity() {
             if (it != null) {
                 Movies = it
                 Log.e("setObservers", "$it")
-                setUpRv()
+                setUpRv(R.id.rvPopularMovies)
+            }
+        }
+
+        viewModel.topRatedMoviesResponse.observe(this) {
+            if (it != null) {
+                Movies = it
+                Log.e("setObservers", "$it")
+                setUpRv(R.id.rvTopRated)
+            }
+        }
+
+        viewModel.upcomingMoviesResponse.observe(this) {
+            if (it != null) {
+                Movies = it
+                Log.e("setObservers", "$it")
+                setUpRv(R.id.rvUpcoming)
             }
         }
     }
 
-    fun setUpRv(){
-        var movieList:MutableList<Result> = arrayListOf()
+
+    fun setUpRv(rvId:Int){
+        var popularMoviesList:MutableList<Result> = arrayListOf()
 
         for(i in 0..Movies?.results?.size!!-1){
-//            Log.e("num",i.toString())
             try {
-                movieList.add(Movies?.results!![i])
+                popularMoviesList.add(Movies?.results!![i])
             }catch (e:Exception){
                 Log.e("Error",e.toString())
             }
 
         }
-
-//        Log.e("kkkk",MatchInfo.toString())
-        val adapterUp=MovieAdapter(this,movieList)
+        val adapterUp=MovieAdapter(this,popularMoviesList)
 
         try {
-            val rvPopular =findViewById<RecyclerView>(R.id.rvBestMovies)
+            val rvPopular =findViewById<RecyclerView>(rvId)
             rvPopular.layoutManager= LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false)
             rvPopular.adapter=adapterUp
         }catch (e:Exception){
