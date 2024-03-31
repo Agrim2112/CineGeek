@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.MoviesViewModel
 import com.example.cinegeek.databinding.ActivityDetailsBinding
+import com.example.models.Cast
+import com.example.models.MovieCast
 import com.example.models.MovieDetails
 import com.example.models.Movies
 import com.example.models.Result
@@ -20,6 +22,7 @@ class DetailsActivity : AppCompatActivity() {
     lateinit var viewModel : MoviesViewModel
     lateinit var movieDetails: MovieDetails
     private var similarMovies : Movies?=null
+    private var castDetails:MovieCast?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +36,7 @@ class DetailsActivity : AppCompatActivity() {
 
         viewModel.getMovieDetails(movieId!!)
         viewModel.getSimilarMovies(movieId!!)
+        viewModel.getMovieCast(movieId!!)
 
         setObservers()
     }
@@ -43,7 +47,16 @@ class DetailsActivity : AppCompatActivity() {
             if (it != null) {
                 similarMovies = it
                 Log.e("setObservers", "$it")
-                setUpRv()
+                setUpSimilarMoviesRv()
+            }
+        }
+
+        viewModel.movieCastResponse.observe(this){
+            if(it!=null)
+            {
+                castDetails=it
+                Log.e("setObservers", "$it")
+                setUpCastRv()
             }
         }
 
@@ -59,17 +72,38 @@ class DetailsActivity : AppCompatActivity() {
         }
     }
 
-    private fun setUpRv(){
+    private fun setUpCastRv() {
+        var castDetailsList: MutableList<Cast> = arrayListOf()
 
-        Log.e("setUpRv", "Similar movies list size:")
+        for(i in  0..castDetails?.cast?.size!!-1)
+        {
+            try {
+                if (castDetails?.cast!![i].known_for_department == "Acting" && castDetails?.cast!![i].profile_path != null) {
+                    castDetailsList.add(castDetails?.cast!![i])
+                }
+            }catch (e:Exception){
+                Log.e("Error",e.toString())
+            }
+        }
+
+        var adapterCast=CastAdapter(this,castDetailsList)
+
+        try {
+            binding?.rvCast?.layoutManager=LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false)
+            binding?.rvCast?.adapter=adapterCast
+        }catch (e:Exception){
+            Log.e("Error",e.toString())
+        }
+
+    }
+
+    private fun setUpSimilarMoviesRv(){
+
 
         var similarMoviesList:MutableList<Result> = arrayListOf()
 
-        Log.e("setUpRv", "Similar movies list size: ${similarMoviesList.size}")
-
         for(i in 0..similarMovies?.results?.size!!-1){
             try {
-                Log.e("setUpRv", "Similar movies list size: ${similarMoviesList.size}")
                 similarMoviesList.add(similarMovies?.results!![i])
             }catch (e:Exception){
                 Log.e("Error",e.toString())
@@ -77,13 +111,11 @@ class DetailsActivity : AppCompatActivity() {
 
         }
 
-        Log.e("setUpRv", "Similar movies list size: ${similarMoviesList.size}")
-
-        val adapterUp = MovieAdapter(this, similarMoviesList)
+        val adapterSimilar = MovieAdapter(this, similarMoviesList)
 
         try {
             binding?.rvSimilar?.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false)
-            binding?.rvSimilar?.adapter = adapterUp
+            binding?.rvSimilar?.adapter = adapterSimilar
         } catch (e: Exception) {
             Log.e("error", e.toString())
         }

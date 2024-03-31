@@ -14,4 +14,5 @@ class MoviesRepository
     suspend fun getMovieDetails(id: String) = apiService.getMovieDetails(id)
 
     suspend fun getSimilarMovies(id:String) = apiService.getSimilarMovies(id)
+    suspend fun getMovieCast (id:String) = apiService.getMovieCast(id)
 }

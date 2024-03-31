@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.models.MovieCast
 import com.example.models.MovieDetails
 import com.example.models.Movies
 import com.example.repository.MoviesRepository
@@ -36,6 +37,10 @@ class MoviesViewModel
 
     val similarMovieListResponse:LiveData<Movies>
         get() = fetchSimilarMoviesList
+
+    private val fetchMovieCast=MutableLiveData<MovieCast>()
+    val movieCastResponse:LiveData<MovieCast>
+        get() = fetchMovieCast
 
     init {
         getPopularMovies()
@@ -103,6 +108,19 @@ class MoviesViewModel
                 }
                 else{
                     Log.d("MoviesViewModel","getSimilarMovies:${response.errorBody()}")
+                }
+            }
+        }
+    }
+
+    fun getMovieCast(movieId:String){
+        viewModelScope.launch {
+            moviesRepository.getMovieCast(movieId).let { response ->
+                if (response.isSuccessful){
+                    fetchMovieCast.postValue(response.body())
+                }
+                else{
+                    Log.d("MoviesViewModel","getMovieCast:${response.errorBody()}")
                 }
             }
         }
