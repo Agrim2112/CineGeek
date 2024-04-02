@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="500dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/img_2"
+            android:src="@drawable/sample_3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -47,6 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:fontFamily="@font/nunito_sans_bold"
             android:text="Kung Fu Panda 4"
             android:textColor="@color/white"
@@ -59,6 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:fontFamily="@font/nunito_sans_bold"
             android:text="Drama, Action, Adventure"
             android:textColor="#9C9C9C"

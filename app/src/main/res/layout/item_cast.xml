@@ -24,7 +24,7 @@
                 android:elevation="10dp"
                 android:layout_height="120dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/img" />
+                android:src="@drawable/sample_4" />
 
             <TextView
                 android:id="@+id/tvActor"

@@ -2,6 +2,7 @@ package com.example.api
 
 import com.example.models.MovieCast
 import com.example.models.MovieDetails
+import com.example.models.MovieImages
 import com.example.models.Movies
 import com.example.utils.Constants.POPULAR
 import com.example.utils.Constants.TOP_RATED
@@ -37,4 +38,7 @@ interface ApiService {
     @GET("https://api.themoviedb.org/3/movie/{id}/credits")
     suspend fun getMovieCast (@Path("id") id:String) : Response<MovieCast>
 
+    @Headers("Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyMGFkZTRmYTczNzA3YjI2YTJkZjJkMDNmZjdkOWUzMSIsInN1YiI6IjY1ZWY1ZGU3ZDQwZDRjMDE2MmVhNWMxNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.-p5dMwe9ZbOk6Ck2hmJ1ik4B9VN675IU6Qe7kF3aZOc")
+    @GET("https://api.themoviedb.org/3/movie/{id}/images")
+    suspend fun getMovieImages(@Path("id") id:String): Response<MovieImages>
 }

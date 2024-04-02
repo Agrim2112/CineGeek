@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.models.MovieCast
 import com.example.models.MovieDetails
+import com.example.models.MovieImages
 import com.example.models.Movies
 import com.example.repository.MoviesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,6 +42,10 @@ class MoviesViewModel
     private val fetchMovieCast=MutableLiveData<MovieCast>()
     val movieCastResponse:LiveData<MovieCast>
         get() = fetchMovieCast
+
+    private val fetchMovieImages = MutableLiveData<MovieImages>()
+    val movieImagesResponse: LiveData<MovieImages>
+        get() = fetchMovieImages
 
     init {
         getPopularMovies()
@@ -121,6 +126,20 @@ class MoviesViewModel
                 }
                 else{
                     Log.d("MoviesViewModel","getMovieCast:${response.errorBody()}")
+                }
+            }
+        }
+    }
+
+    fun getMovieImages(movieId: String){
+        viewModelScope.launch {
+            moviesRepository.getMovieImages(movieId).let {response ->
+                if(response.isSuccessful)
+                {
+                    fetchMovieImages.postValue(response.body())
+                }
+                else{
+                    Log.d("MoviesViewModel","getMovieImages:${response.errorBody()}")
                 }
             }
         }
