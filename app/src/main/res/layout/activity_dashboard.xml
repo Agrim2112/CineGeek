@@ -7,241 +7,128 @@
     android:background="@color/blue"
     tools:context=".DashboardActivity">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <EditText
-            android:id="@+id/etSearch"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_margin="16dp"
-            android:background="@drawable/edittext_bg"
-            android:drawableStart="@drawable/search"
-            android:drawableEnd="@drawable/mic"
-            android:drawablePadding="16dp"
-            android:fontFamily="@font/cabin_semibold"
-            android:hint="Search Movies,TV Shows"
-            android:inputType="text"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:textColor="#979696"
-            android:textColorHint="#979696"
-            android:textSize="18sp" />
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="100dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="200dp">
-
-                <androidx.viewpager2.widget.ViewPager2
-                    android:id="@+id/vpSlider"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <TextView
-                android:id="@+id/tvBestMovies"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginBottom="24dp"
-                android:layout_marginTop="32dp"
-                android:fontFamily="@font/nunito_sans_bold"
-                android:text="Popular Movies"
-                android:textColor="@color/yellow"
-                android:textSize="18sp" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvPopularMovies"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clipToPadding="false"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <TextView
-                android:id="@+id/tvGenres"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginBottom="24dp"
-                android:layout_marginTop="32dp"
-                android:fontFamily="@font/nunito_sans_bold"
-                android:text="Top Rated"
-                android:textColor="@color/yellow"
-                android:textSize="18sp" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvTopRated"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clipToPadding="false"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <TextView
-                android:id="@+id/tvUpcomingMovies"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginBottom="24dp"
-                android:layout_marginTop="32dp"
-                android:fontFamily="@font/nunito_sans_bold"
-                android:text="Upcoming Movies"
-                android:textColor="@color/yellow"
-                android:textSize="18sp" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="40dp">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvUpcoming"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clipToPadding="false"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
-                    android:paddingBottom="60dp" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </LinearLayout>
-    </ScrollView>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
         android:layout_height="70dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-
-        <com.google.android.material.bottomappbar.BottomAppBar
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomnavbar"
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_gravity="bottom"
-            android:backgroundTint="#323649">
+            android:background="#323649"
+            android:backgroundTint="#323649"
+            app:itemIconTint="@color/white"
+            app:itemPaddingBottom="12dp"
+            app:itemPaddingTop="12dp"
+            app:itemTextAppearanceActiveBoldEnabled="true"
+            app:itemTextColor="@color/white"
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/bottom_nav_menu">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
+            <!--            <LinearLayout-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="match_parent"-->
+            <!--                android:orientation="horizontal">-->
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:layout_margin="6dp"
-                        android:src="@drawable/explore"/>
+            <!--                <LinearLayout-->
+            <!--                    android:layout_width="0dp"-->
+            <!--                    android:layout_height="match_parent"-->
+            <!--                    android:layout_weight="1"-->
+            <!--                    android:gravity="center"-->
+            <!--                    android:orientation="vertical">-->
+            <!--                    <ImageView-->
+            <!--                        android:layout_width="22dp"-->
+            <!--                        android:layout_height="22dp"-->
+            <!--                        android:layout_margin="6dp"-->
+            <!--                        android:src="@drawable/explore"/>-->
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Explore"
-                        android:textSize="14sp"
-                        android:textAlignment="center"
-                        android:textColor="@color/white" />
+            <!--                    <TextView-->
+            <!--                        android:layout_width="wrap_content"-->
+            <!--                        android:layout_height="wrap_content"-->
+            <!--                        android:text="Explore"-->
+            <!--                        android:textSize="14sp"-->
+            <!--                        android:textAlignment="center"-->
+            <!--                        android:textColor="@color/white" />-->
 
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:layout_margin="6dp"
-                        android:src="@drawable/heart"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Favourites"
-                        android:textSize="14sp"
-                        android:textAlignment="center"
-                        android:textColor="@color/white"/>
+            <!--                </LinearLayout>-->
+            <!--                <LinearLayout-->
+            <!--                    android:layout_width="0dp"-->
+            <!--                    android:layout_height="match_parent"-->
+            <!--                    android:layout_weight="1"-->
+            <!--                    android:gravity="center"-->
+            <!--                    android:orientation="vertical">-->
+            <!--                    <ImageView-->
+            <!--                        android:layout_width="22dp"-->
+            <!--                        android:layout_height="22dp"-->
+            <!--                        android:layout_margin="6dp"-->
+            <!--                        android:src="@drawable/heart"/>-->
+            <!--                    <TextView-->
+            <!--                        android:layout_width="wrap_content"-->
+            <!--                        android:layout_height="wrap_content"-->
+            <!--                        android:text="Favourites"-->
+            <!--                        android:textSize="14sp"-->
+            <!--                        android:textAlignment="center"-->
+            <!--                        android:textColor="@color/white"/>-->
 
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
+            <!--                </LinearLayout>-->
+            <!--                <LinearLayout-->
+            <!--                    android:layout_width="0dp"-->
+            <!--                    android:layout_height="match_parent"-->
+            <!--                    android:layout_weight="1"-->
+            <!--                    android:gravity="center"-->
 
-                    android:orientation="vertical">
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:layout_margin="6dp"
-                        android:src="@drawable/cart"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Cart"
-                        android:textSize="14sp"
-                        android:textAlignment="center"
-                        android:textColor="@color/white"/>
+            <!--                    android:orientation="vertical">-->
+            <!--                    <ImageView-->
+            <!--                        android:layout_width="22dp"-->
+            <!--                        android:layout_height="22dp"-->
+            <!--                        android:layout_margin="6dp"-->
+            <!--                        android:src="@drawable/cart"/>-->
+            <!--                    <TextView-->
+            <!--                        android:layout_width="wrap_content"-->
+            <!--                        android:layout_height="wrap_content"-->
+            <!--                        android:text="Cart"-->
+            <!--                        android:textSize="14sp"-->
+            <!--                        android:textAlignment="center"-->
+            <!--                        android:textColor="@color/white"/>-->
 
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
+            <!--                </LinearLayout>-->
+            <!--                <LinearLayout-->
+            <!--                    android:layout_width="0dp"-->
+            <!--                    android:layout_height="match_parent"-->
+            <!--                    android:layout_weight="1"-->
+            <!--                    android:gravity="center"-->
 
-                    android:orientation="vertical">
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:layout_margin="6dp"
-                        android:src="@drawable/profile"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Profile"
-                        android:textSize="14sp"
-                        android:textAlignment="center"
-                        android:textColor="@color/white"/>
+            <!--                    android:orientation="vertical">-->
+            <!--                    <ImageView-->
+            <!--                        android:layout_width="22dp"-->
+            <!--                        android:layout_height="22dp"-->
+            <!--                        android:layout_margin="6dp"-->
+            <!--                        android:src="@drawable/profile"/>-->
+            <!--                    <TextView-->
+            <!--                        android:layout_width="wrap_content"-->
+            <!--                        android:layout_height="wrap_content"-->
+            <!--                        android:text="Profile"-->
+            <!--                        android:textSize="14sp"-->
+            <!--                        android:textAlignment="center"-->
+            <!--                        android:textColor="@color/white"/>-->
 
-                </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.bottomappbar.BottomAppBar>
+            <!--                </LinearLayout>-->
+            <!--            </LinearLayout>-->
+        </com.google.android.material.bottomnavigation.BottomNavigationView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

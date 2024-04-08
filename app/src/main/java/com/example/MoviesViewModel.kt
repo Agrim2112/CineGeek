@@ -1,6 +1,7 @@
 package com.example
 
 import android.util.Log
+import android.widget.MultiAutoCompleteTextView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -46,6 +47,11 @@ class MoviesViewModel
     private val fetchMovieImages = MutableLiveData<MovieImages>()
     val movieImagesResponse: LiveData<MovieImages>
         get() = fetchMovieImages
+
+    private val fetchSearchResults = MutableLiveData<Movies>()
+
+    val searrchResultsReponse: LiveData<Movies>
+        get() = fetchSearchResults
 
     init {
         getPopularMovies()
@@ -140,6 +146,19 @@ class MoviesViewModel
                 }
                 else{
                     Log.d("MoviesViewModel","getMovieImages:${response.errorBody()}")
+                }
+            }
+        }
+    }
+
+    fun getSearchResults(search:String){
+        viewModelScope.launch {
+            moviesRepository.getSearchResults(search).let { response ->
+                if (response.isSuccessful){
+                    fetchSearchResults.postValue(response.body())
+                }
+                else{
+                    Log.d("MoviesViewModel","getSearchResults;${response.errorBody()}")
                 }
             }
         }
