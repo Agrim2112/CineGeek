@@ -50,7 +50,7 @@ class MoviesViewModel
 
     private val fetchSearchResults = MutableLiveData<Movies>()
 
-    val searrchResultsReponse: LiveData<Movies>
+    val searchResultsReponse: LiveData<Movies>
         get() = fetchSearchResults
 
     init {
