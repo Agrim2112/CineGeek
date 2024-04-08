@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:background="@color/blue"
+    android:layout_height="wrap_content">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="10dp"
+        app:cardCornerRadius="8dp"
+        android:layout_marginTop="10dp"
+        app:cardBackgroundColor="#2E3245"
+        android:background="@color/blue">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:id="@+id/ivMovie"
+                android:layout_width="75dp"
+                app:riv_corner_radius="8dp"
+                android:layout_marginVertical="10dp"
+                android:layout_marginLeft="10dp"
+                android:elevation="10dp"
+                android:layout_height="100dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/sample" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="25dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textSize="17sp"
+                    android:fontFamily="@font/open_sans_semibold"
+                    android:text="Batman"
+                    android:textColor="@color/white" />
+                <TextView
+                    android:id="@+id/tvGenre"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:fontFamily="@font/open_sans"
+                    android:layout_marginTop="5dp"
+                    android:textSize="15sp"
+                    android:text="Action, Adventure"
+                    android:textColor="#B6B6B6" />
+                <TextView
+                    android:id="@+id/tvLanguage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="2"
+                    android:fontFamily="@font/open_sans"
+                    android:layout_marginTop="16dp"
+                    android:textSize="15sp"
+                    android:text="EN"
+                    android:textColor="#B6B6B6" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</LinearLayout>
