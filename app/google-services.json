@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "855057012990",
+    "project_id": "cinegeek-5bce9",
+    "storage_bucket": "cinegeek-5bce9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:855057012990:android:ddc2e99d8cd361a0b32daf",
+        "android_client_info": {
+          "package_name": "com.example.cinegeek"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDWbIOQUHqfvNKkiw_rv0rFwrVF1N2jYE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
