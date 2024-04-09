@@ -2,10 +2,14 @@ package com.example.cinegeek
 
 import SliderAdapter
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.speech.RecognizerIntent
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -18,6 +22,7 @@ import com.example.models.Movies
 import com.example.models.Result
 import com.example.models.Slider
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 import java.util.Timer
 import java.util.TimerTask
 
@@ -55,6 +60,20 @@ class ExploreFragment : Fragment() {
             binding?.loadingAnimation?.visibility=View.VISIBLE
         }
 
+        binding?.etSearch?.setOnTouchListener { v, event ->
+            val DRAWABLE_RIGHT = 2
+
+            if (event.action == MotionEvent.ACTION_UP) {
+                if (event.rawX >= (binding.etSearch.right - binding.etSearch.compoundDrawables[DRAWABLE_RIGHT].bounds.width())) {
+                    askSpeechInput()
+                    Log.d("speech","Working")
+                    v.performClick()
+                    return@setOnTouchListener true
+                }
+            }
+            false
+        }
+
         timer = Timer()
         timer.scheduleAtFixedRate(SliderTask(), 3000, 3000)
 
@@ -83,6 +102,39 @@ class ExploreFragment : Fragment() {
         }
 
         return view
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if(requestCode == 100){
+            if(resultCode ==  Activity.RESULT_OK && data != null){
+                val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                binding.etSearch.setText(result?.get(0))
+                Log.d("speech","Working")
+
+                if(result?.get(0)?.isNotEmpty() == true){
+                    Log.d("speech","Working")
+                    val searchFragment = SearchFragment().apply {
+                        arguments = Bundle().apply {
+                            putString("searchText", result?.get(0))
+                        }
+                    }
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.frameLayout, searchFragment)
+                        .addToBackStack("ExploreFragment")
+                        .commit()
+                }
+            }
+        }
+    }
+    fun askSpeechInput() {
+        Log.d("speech","Working")
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to search")
+        startActivityForResult(intent, 100)
     }
 
     inner class SliderTask : TimerTask() {

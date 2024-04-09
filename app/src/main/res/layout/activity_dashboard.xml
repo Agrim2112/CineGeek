@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/blue"
-    android:windowSoftInputMode="adjustNothing"
+    android:windowSoftInputMode="adjustPan"
     tools:context=".DashboardActivity">
 
 
@@ -13,123 +13,37 @@
         android:id="@+id/frameLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout"
+        app:layout_constraintBottom_toTopOf="@+id/bottomnavbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/coordinatorLayout"
+<!--    <androidx.coordinatorlayout.widget.CoordinatorLayout-->
+<!--        android:id="@+id/coordinatorLayout"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="70dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent">-->
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomnavbar"
         android:layout_width="match_parent"
         android:layout_height="70dp"
+        android:layout_gravity="bottom"
+        android:background="#323649"
+        android:backgroundTint="#323649"
+        app:itemIconTint="@color/white"
+        app:itemPaddingBottom="12dp"
+        app:itemPaddingTop="12dp"
+        app:itemTextAppearanceActiveBoldEnabled="true"
+        app:itemTextColor="@color/white"
+        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_nav_menu">
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottomnavbar"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:layout_gravity="bottom"
-            android:background="#323649"
-            android:backgroundTint="#323649"
-            app:itemIconTint="@color/white"
-            app:itemPaddingBottom="12dp"
-            app:itemPaddingTop="12dp"
-            app:itemTextAppearanceActiveBoldEnabled="true"
-            app:itemTextColor="@color/white"
-            app:labelVisibilityMode="labeled"
-            app:menu="@menu/bottom_nav_menu">
-
-            <!--            <LinearLayout-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="match_parent"-->
-            <!--                android:orientation="horizontal">-->
-
-            <!--                <LinearLayout-->
-            <!--                    android:layout_width="0dp"-->
-            <!--                    android:layout_height="match_parent"-->
-            <!--                    android:layout_weight="1"-->
-            <!--                    android:gravity="center"-->
-            <!--                    android:orientation="vertical">-->
-            <!--                    <ImageView-->
-            <!--                        android:layout_width="22dp"-->
-            <!--                        android:layout_height="22dp"-->
-            <!--                        android:layout_margin="6dp"-->
-            <!--                        android:src="@drawable/explore"/>-->
-
-            <!--                    <TextView-->
-            <!--                        android:layout_width="wrap_content"-->
-            <!--                        android:layout_height="wrap_content"-->
-            <!--                        android:text="Explore"-->
-            <!--                        android:textSize="14sp"-->
-            <!--                        android:textAlignment="center"-->
-            <!--                        android:textColor="@color/white" />-->
-
-            <!--                </LinearLayout>-->
-            <!--                <LinearLayout-->
-            <!--                    android:layout_width="0dp"-->
-            <!--                    android:layout_height="match_parent"-->
-            <!--                    android:layout_weight="1"-->
-            <!--                    android:gravity="center"-->
-            <!--                    android:orientation="vertical">-->
-            <!--                    <ImageView-->
-            <!--                        android:layout_width="22dp"-->
-            <!--                        android:layout_height="22dp"-->
-            <!--                        android:layout_margin="6dp"-->
-            <!--                        android:src="@drawable/heart"/>-->
-            <!--                    <TextView-->
-            <!--                        android:layout_width="wrap_content"-->
-            <!--                        android:layout_height="wrap_content"-->
-            <!--                        android:text="Favourites"-->
-            <!--                        android:textSize="14sp"-->
-            <!--                        android:textAlignment="center"-->
-            <!--                        android:textColor="@color/white"/>-->
-
-            <!--                </LinearLayout>-->
-            <!--                <LinearLayout-->
-            <!--                    android:layout_width="0dp"-->
-            <!--                    android:layout_height="match_parent"-->
-            <!--                    android:layout_weight="1"-->
-            <!--                    android:gravity="center"-->
-
-            <!--                    android:orientation="vertical">-->
-            <!--                    <ImageView-->
-            <!--                        android:layout_width="22dp"-->
-            <!--                        android:layout_height="22dp"-->
-            <!--                        android:layout_margin="6dp"-->
-            <!--                        android:src="@drawable/cart"/>-->
-            <!--                    <TextView-->
-            <!--                        android:layout_width="wrap_content"-->
-            <!--                        android:layout_height="wrap_content"-->
-            <!--                        android:text="Cart"-->
-            <!--                        android:textSize="14sp"-->
-            <!--                        android:textAlignment="center"-->
-            <!--                        android:textColor="@color/white"/>-->
-
-            <!--                </LinearLayout>-->
-            <!--                <LinearLayout-->
-            <!--                    android:layout_width="0dp"-->
-            <!--                    android:layout_height="match_parent"-->
-            <!--                    android:layout_weight="1"-->
-            <!--                    android:gravity="center"-->
-
-            <!--                    android:orientation="vertical">-->
-            <!--                    <ImageView-->
-            <!--                        android:layout_width="22dp"-->
-            <!--                        android:layout_height="22dp"-->
-            <!--                        android:layout_margin="6dp"-->
-            <!--                        android:src="@drawable/profile"/>-->
-            <!--                    <TextView-->
-            <!--                        android:layout_width="wrap_content"-->
-            <!--                        android:layout_height="wrap_content"-->
-            <!--                        android:text="Profile"-->
-            <!--                        android:textSize="14sp"-->
-            <!--                        android:textAlignment="center"-->
-            <!--                        android:textColor="@color/white"/>-->
-
-            <!--                </LinearLayout>-->
-            <!--            </LinearLayout>-->
-        </com.google.android.material.bottomnavigation.BottomNavigationView>
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
+<!--    </androidx.coordinatorlayout.widget.CoordinatorLayout>-->
 </androidx.constraintlayout.widget.ConstraintLayout>

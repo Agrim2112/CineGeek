@@ -1,9 +1,15 @@
 package com.example.cinegeek
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import android.text.Editable
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -16,6 +22,7 @@ import com.example.models.Backdrop
 import com.example.models.Movies
 import com.example.models.Result
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 import java.util.Timer
 
 
@@ -49,7 +56,7 @@ class SearchFragment : Fragment() {
                     }
                     parentFragmentManager.beginTransaction()
                         .replace(R.id.frameLayout, searchFragment)
-                        .addToBackStack(null)
+                        .addToBackStack("ExploreFragment")
                         .commit()
                 }
                 return@setOnEditorActionListener true
@@ -59,13 +66,67 @@ class SearchFragment : Fragment() {
 
         viewModel = ViewModelProvider(this)[MoviesViewModel::class.java]
 
-        if(isAdded)
-            binding?.etSearch?.text
+        if(isAdded) {
+            val factory = Editable.Factory.getInstance()
+            binding?.etSearch?.text = factory.newEditable(searchText)
+        }
+
+        binding?.etSearch?.setOnTouchListener { v, event ->
+            val DRAWABLE_LEFT = 0
+            val DRAWABLE_RIGHT = 2
+
+            if (event.action == MotionEvent.ACTION_UP) {
+                if (event.rawX >= (binding.etSearch.right - binding.etSearch.compoundDrawables[DRAWABLE_RIGHT].bounds.width())) {
+                    askSpeechInput()
+                    Log.d("speech","Working")
+                    v.performClick()
+                    return@setOnTouchListener true
+                } else if (event.rawX <= (binding.etSearch.left + binding.etSearch.compoundDrawables[DRAWABLE_LEFT].bounds.width())) {
+                    parentFragmentManager.popBackStack()
+                    return@setOnTouchListener true
+                }
+            }
+            false
+        }
 
         setObservers()
         viewModel.getSearchResults(searchText!!)
 
         return view
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if(requestCode == 100){
+            if(resultCode ==  Activity.RESULT_OK && data != null){
+                val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                binding.etSearch.setText(result?.get(0))
+                Log.d("speech","Working")
+
+                if(result?.get(0)?.isNotEmpty() == true){
+                    Log.d("speech","Working")
+                    val searchFragment = SearchFragment().apply {
+                        arguments = Bundle().apply {
+                            putString("searchText", result?.get(0))
+                        }
+                    }
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.frameLayout, searchFragment)
+                        .addToBackStack("ExploreFragment")
+                        .commit()
+                }
+            }
+        }
+    }
+
+    fun askSpeechInput() {
+            Log.d("speech","Working")
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to search")
+            startActivityForResult(intent, 100)
     }
 
     private fun setObservers() {

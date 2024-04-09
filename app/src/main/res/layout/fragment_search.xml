@@ -25,7 +25,7 @@
                 android:layout_marginHorizontal="16dp"
                 android:imeOptions="actionSearch"
                 android:background="@drawable/edittext_bg"
-                android:drawableStart="@drawable/search"
+                android:drawableStart="@drawable/back"
                 android:drawableEnd="@drawable/mic"
                 android:drawablePadding="16dp"
                 android:fontFamily="@font/cabin_semibold"
