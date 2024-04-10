@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.example.cinegeek.databinding.ActivitySignUpBinding
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 
 class SignUpActivity : AppCompatActivity() {
@@ -15,9 +16,10 @@ class SignUpActivity : AppCompatActivity() {
         binding=ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
         firebaseAuth= FirebaseAuth.getInstance()
 
-        binding.tvLogin.setOnClickListener()
+        binding.tvSignUp.setOnClickListener()
         {
             val intent= Intent(this,LoginActivity::class.java)
             startActivity(intent)
@@ -32,7 +34,7 @@ class SignUpActivity : AppCompatActivity() {
                 firebaseAuth.createUserWithEmailAndPassword(email,pwd).addOnCompleteListener {
                     if(it.isSuccessful)
                     {
-                        val intent=Intent(this,MainActivity::class.java)
+                        val intent=Intent(this,DashboardActivity::class.java)
                         startActivity(intent)
                     }
                     else

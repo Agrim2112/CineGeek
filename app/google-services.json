@@ -12,7 +12,12 @@
           "package_name": "com.example.cinegeek"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "855057012990-8gtgl9pe49ij8esiht1c8rmd78jm1p9t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBDWbIOQUHqfvNKkiw_rv0rFwrVF1N2jYE"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "855057012990-8gtgl9pe49ij8esiht1c8rmd78jm1p9t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
