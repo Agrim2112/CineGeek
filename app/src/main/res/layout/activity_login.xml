@@ -53,13 +53,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
-        android:textAlignment="gravity"
-        android:textColor="@color/white"
         android:layout_marginTop="20dp"
         android:paddingStart="15dp"
         android:drawableLeft="@drawable/padlock"
-        android:drawablePadding="8dp"
+        android:textColor="@color/white"
         android:fontFamily="@font/cabin_semibold"
+        android:drawablePadding="8dp"
         android:hint="Password"
         android:inputType="textPassword"
         android:minHeight="48dp"
@@ -68,6 +67,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etUsername" />
+
 
     <TextView
         android:id="@+id/tvForgotPwd"
@@ -148,13 +148,13 @@
             android:layout_marginLeft="20dp"
             android:layout_height="40dp"
             app:riv_corner_radius="100dp"
-            android:src="@drawable/google"/>
+            android:src="@drawable/facebook"/>
         <com.makeramen.roundedimageview.RoundedImageView
             android:layout_width="50dp"
             android:layout_height="40dp"
             android:layout_marginLeft="20dp"
             app:riv_corner_radius="100dp"
-            android:src="@drawable/google"/>
+            android:src="@drawable/twitter"/>
 
     </LinearLayout>
 
@@ -165,7 +165,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:orientation="horizontal"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="30dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
