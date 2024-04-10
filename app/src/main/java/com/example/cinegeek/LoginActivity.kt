@@ -22,7 +22,6 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var firebase:FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
-    private lateinit var signInRequest: BeginSignInRequest
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding=ActivityLoginBinding.inflate(layoutInflater)
@@ -37,7 +36,9 @@ class LoginActivity : AppCompatActivity() {
 
         googleSignInClient = GoogleSignIn.getClient(this , gso)
 
-        signInGoogle()
+        binding?.ivGoogle?.setOnClickListener() {
+            signInGoogle()
+        }
 
 
         binding?.tvSignUp?.setOnClickListener(){
