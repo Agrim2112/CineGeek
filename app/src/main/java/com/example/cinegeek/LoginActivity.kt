@@ -23,6 +23,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.OAuthProvider
 import java.util.Arrays
 
 class LoginActivity : AppCompatActivity() {
@@ -34,6 +35,41 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding=ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding?.ivTwitter?.setOnClickListener() {
+            val provider = OAuthProvider.newBuilder("twitter.com")
+            provider.addCustomParameter("lang", "en")
+
+            val pendingResultTask = firebaseAuth.pendingAuthResult
+            if (pendingResultTask != null) {
+                pendingResultTask
+                    .addOnSuccessListener {
+                        startActivity(Intent(this, DashboardActivity::class.java))
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                    }
+            } else {
+                firebaseAuth
+                    .startActivityForSignInWithProvider(this, provider.build())
+                    .addOnSuccessListener {
+                        startActivity(Intent(this, DashboardActivity::class.java))
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                    }
+            }
+
+            val firebaseUser = firebaseAuth.currentUser!!
+            firebaseUser
+                .startActivityForLinkWithProvider(this, provider.build())
+                .addOnSuccessListener {
+                    startActivity(Intent(this, DashboardActivity::class.java))
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                }
+        }
 
         callbackManager = CallbackManager.Factory.create()
 

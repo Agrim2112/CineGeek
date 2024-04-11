@@ -37,9 +37,9 @@
         android:inputType="text"
         android:minHeight="48dp"
         android:paddingStart="15dp"
+        android:textColor="@color/white"
         android:textColorHint="#979696"
         android:textSize="18sp"
-        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,20 +47,20 @@
 
     <EditText
         android:id="@+id/etPassword"
-        android:background="@drawable/edittext_bg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
         android:layout_marginTop="20dp"
-        android:paddingStart="15dp"
+        android:layout_marginEnd="30dp"
+        android:background="@drawable/edittext_bg"
         android:drawableLeft="@drawable/padlock"
-        android:textColor="@color/white"
-        android:fontFamily="@font/cabin_semibold"
         android:drawablePadding="8dp"
+        android:fontFamily="@font/cabin_semibold"
         android:hint="Password"
         android:inputType="textPassword"
         android:minHeight="48dp"
+        android:paddingStart="15dp"
+        android:textColor="@color/white"
         android:textColorHint="#979696"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -72,8 +72,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
         android:layout_marginTop="80dp"
+        android:layout_marginEnd="30dp"
         android:background="@drawable/button_bg"
         android:fontFamily="@font/lato_black"
         android:text="Sign UP"
@@ -114,8 +114,8 @@
         android:id="@+id/llSignIn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_marginTop="10dp"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvSignInWith">
@@ -124,34 +124,37 @@
             android:id="@+id/ivGoogle"
             android:layout_width="50dp"
             android:layout_height="40dp"
-            app:riv_corner_radius="100dp"
-            android:src="@drawable/google"/>
+            android:src="@drawable/google"
+            app:riv_corner_radius="100dp" />
 
         <com.makeramen.roundedimageview.RoundedImageView
             android:id="@+id/ivFacebook"
             android:layout_width="50dp"
-            android:layout_marginLeft="20dp"
             android:layout_height="40dp"
-            app:riv_corner_radius="100dp"
-            android:src="@drawable/facebook"/>
+            android:layout_marginLeft="20dp"
+            android:src="@drawable/facebook"
+            app:riv_corner_radius="100dp" />
+
         <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/ivTwitter"
             android:layout_width="50dp"
             android:layout_height="40dp"
             android:layout_marginLeft="20dp"
-            app:riv_corner_radius="100dp"
-            android:src="@drawable/twitter"/>
+            android:src="@drawable/twitter"
+            app:riv_corner_radius="100dp" />
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="30dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintStart_toStartOf="parent">
 
         <TextView
             android:id="@+id/tvSign"
