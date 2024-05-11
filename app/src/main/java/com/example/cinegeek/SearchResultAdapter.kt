@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.cinegeek.databinding.ItemMoviesBinding
@@ -12,6 +14,8 @@ import com.example.models.Result
 
 class SearchResultAdapter(private val context: Context, private val MoviesList: MutableList<Result>) : RecyclerView.Adapter<SearchResultAdapter.ViewHolder>() {
 
+    private val differ = AsyncListDiffer(this, SearchResultDiffCallback())
+
     class ViewHolder(binding: ItemSearchResultBinding) : RecyclerView.ViewHolder(binding.root){
         var movieName = binding.tvTitle
         var movieGenre = binding.tvGenre
@@ -19,6 +23,17 @@ class SearchResultAdapter(private val context: Context, private val MoviesList: 
         val movieImage = binding.ivMovie
     }
 
+    class SearchResultDiffCallback : DiffUtil.ItemCallback<Result>() {
+        override fun areItemsTheSame(oldItem: Result, newItem: Result): Boolean {
+            // Replace with your own logic
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Result, newItem: Result): Boolean {
+            // Replace with your own logic
+            return oldItem == newItem
+        }
+    }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             ItemSearchResultBinding.inflate(
@@ -52,6 +67,10 @@ class SearchResultAdapter(private val context: Context, private val MoviesList: 
             intent.putExtra("movieId",model.id.toString())
             context.startActivity(intent)
         }
+    }
+
+    fun submitList(list: List<Result>) {
+        differ.submitList(list)
     }
 
 }

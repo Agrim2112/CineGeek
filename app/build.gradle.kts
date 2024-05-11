@@ -90,5 +90,10 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
 
+    //Facebook
     implementation ("com.facebook.android:facebook-android-sdk:latest.release")
+
+    //Glassmorphism
+//    implementation ("com.github.mmin18:realtimeblurview:1.2.1")
+
 }

@@ -49,6 +49,7 @@
                 android:textColor="@color/white"
                 android:textColorHint="#979696"
                 android:textSize="18sp" />
+
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <ScrollView

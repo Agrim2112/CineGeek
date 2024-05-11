@@ -32,7 +32,7 @@ class MovieAdapter(private val context: Context, private val MoviesList: Mutable
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val model = MoviesList[position]
 
-        val trimmedText = if (model.title.length > 17) {
+        val trimmedText = if (model.title.length >= 17) {
             model.title.substring(0, 14) + "..."
         } else {
             model.title

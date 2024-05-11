@@ -27,6 +27,7 @@ class DetailsActivity : AppCompatActivity() {
     private var similarMovies : Movies?=null
     private var castDetails:MovieCast?=null
     private var movieImages:MovieImages?=null
+    private var movieGenres:String=""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,8 +86,12 @@ class DetailsActivity : AppCompatActivity() {
 
                 for(i in 0..it.genres.size-2)
                 {
-                    binding?.tvGenres?.text
+                    movieGenres+=it.genres[i].name+", "
+
                 }
+                movieGenres+=it.genres[it.genres.size-1].name
+
+                binding?.tvGenres?.text=movieGenres
             }
         }
     }
@@ -144,7 +149,6 @@ class DetailsActivity : AppCompatActivity() {
     }
 
     private fun setUpSimilarMoviesRv(){
-
 
         var similarMoviesList:MutableList<Result> = arrayListOf()
 
