@@ -1,59 +1,77 @@
 package com.example.cinegeek
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.MoviesViewModel
+import com.example.cinegeek.databinding.FragmentFavouritesBinding
+import com.example.models.FavouriteModel
+import com.example.models.MovieDetails
+import com.example.models.Movies
+import dagger.hilt.android.AndroidEntryPoint
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [FavouritesFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+@AndroidEntryPoint
 class FavouritesFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var _binding: FragmentFavouritesBinding? = null
+    private val binding get() = _binding!!
+    lateinit var viewModel : MoviesViewModel
+    private var Movies : List<MovieDetails> = mutableListOf()
+    private var FavouritesList : List<FavouriteModel>?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favourites, container, false)
+        _binding = FragmentFavouritesBinding.inflate(inflater, container, false)
+        val view = binding.root
+
+        viewModel = ViewModelProvider(this)[MoviesViewModel::class.java]
+
+
+        setObservers()
+        viewModel.getFavourites()
+
+        return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FavouritesFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FavouritesFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    private fun setObservers() {
+        viewModel.fetchFavouritesResponse.observe(viewLifecycleOwner) { favourites ->
+            if (favourites.isNotEmpty()) {
+                FavouritesList = favourites
+                viewModel.movieDetailsResponse.observe(viewLifecycleOwner) { movieDetails ->
+                    if (movieDetails != null) {
+                        Movies = Movies.plus(movieDetails)
+                        if (Movies.size == FavouritesList!!.size) {
+                            val favouritesListAdapter = FavouritesListAdapter(requireContext(), Movies as MutableList<MovieDetails>)
+                            binding?.rvFavourites?.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+                            binding?.rvFavourites?.adapter = favouritesListAdapter
+                        }
+                    }
+                }
+                for (favourite in FavouritesList!!) {
+                    viewModel.getMovieDetails(favourite.movieId)
                 }
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getFavourites()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

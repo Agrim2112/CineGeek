@@ -32,6 +32,10 @@ class MoviesViewModel
     val isFavouriteResponse:LiveData<Boolean>
         get()=isFavourite
 
+    private val fetchFavourites=MutableLiveData<List<FavouriteModel>>()
+    val fetchFavouritesResponse:LiveData<List<FavouriteModel>>
+        get()=fetchFavourites
+
     private val fetchPopularMovies=MutableLiveData<Movies>()
     val popularMoviesResponse:LiveData<Movies>
         get()=fetchPopularMovies
@@ -221,6 +225,28 @@ class MoviesViewModel
             .addOnFailureListener {
                 Log.e("MoviesViewModel", "removeFromFavourites: ${it.message}")
             }
+    }
+
+    fun getFavourites(){
+        viewModelScope.launch {
+            myRef.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val list = mutableListOf<FavouriteModel>()
+                    for (data in snapshot.children) {
+                        val fav = data.getValue(FavouriteModel::class.java)
+                        if (fav != null) {
+                            list.add(fav)
+                        }
+                    }
+                    Log.e("MoviesViewModel", "onDataChange: $list")
+                    fetchFavourites.postValue(list)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("MoviesViewModel", "onCancelled: ${error.message}")
+                }
+            })
+        }
     }
 
     fun checkFavourites(movieId:String){
