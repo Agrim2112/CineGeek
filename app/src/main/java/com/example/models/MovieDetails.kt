@@ -4,6 +4,7 @@ data class MovieDetails(
     val adult: Boolean,
     val backdrop_path: String,
     val belongs_to_collection: Any,
+    val isFavourite: Boolean=false,
     val budget: Int,
     val genres: List<Genre>,
     val homepage: String,

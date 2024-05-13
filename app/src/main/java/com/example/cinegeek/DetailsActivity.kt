@@ -12,12 +12,15 @@ import com.example.MoviesViewModel
 import com.example.cinegeek.databinding.ActivityDetailsBinding
 import com.example.models.Backdrop
 import com.example.models.Cast
+import com.example.models.FavouriteModel
 import com.example.models.MovieCast
 import com.example.models.MovieDetails
 import com.example.models.MovieImages
 import com.example.models.Movies
 import com.example.models.Result
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.math.pow
+import kotlin.math.round
 
 @AndroidEntryPoint
 class DetailsActivity : AppCompatActivity() {
@@ -28,6 +31,7 @@ class DetailsActivity : AppCompatActivity() {
     private var castDetails:MovieCast?=null
     private var movieImages:MovieImages?=null
     private var movieGenres:String=""
+    private var isFavourite:Boolean=false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,12 +47,31 @@ class DetailsActivity : AppCompatActivity() {
         viewModel.getSimilarMovies(movieId!!)
         viewModel.getMovieCast(movieId!!)
         viewModel.getMovieImages(movieId!!)
+        viewModel.checkFavourites(movieId!!)
+
+
+        val favouriteDetails = FavouriteModel(true, movieId)
+
+        binding?.favoriteButton?.setOnCheckedChangeListener {_, isChecked ->
+            if(isChecked)
+                viewModel.addToFavourites(favouriteDetails)
+            else
+                viewModel.removeFromFavourites(favouriteDetails)
+        }
 
         setObservers()
     }
 
     private fun setObservers() {
 
+
+        viewModel.isFavouriteResponse.observe(this){
+            if(it!=null)
+            {
+                isFavourite=it
+                binding?.favoriteButton?.isChecked=isFavourite
+            }
+        }
         viewModel.similarMovieListResponse.observe(this) {
             if (it != null) {
                 similarMovies = it
@@ -92,10 +115,16 @@ class DetailsActivity : AppCompatActivity() {
                 movieGenres+=it.genres[it.genres.size-1].name
 
                 binding?.tvGenres?.text=movieGenres
+                binding?.tvRuntime?.text=(it.runtime/60).toString() +"h "+ (it.runtime%60).toString()+"m"
+                binding?.tvRating?.text=roundOff(it.vote_average, 1).toString()
             }
         }
     }
 
+    fun roundOff(double: Double, decimalPoints: Int): Double {
+        val multiplier = 10.0.pow(decimalPoints)
+        return round(double * multiplier) / multiplier
+    }
     private fun setUpImagesRv() {
         var movieImagesList : MutableList<Backdrop> = arrayListOf()
 

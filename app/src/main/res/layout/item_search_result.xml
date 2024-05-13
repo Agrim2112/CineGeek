@@ -50,21 +50,32 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
-                    android:fontFamily="@font/open_sans"
-                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/open_sans_semibold"
+                    android:layout_marginTop="15dp"
                     android:textSize="15sp"
                     android:text="Action, Adventure"
                     android:textColor="#B6B6B6" />
-                <TextView
-                    android:id="@+id/tvLanguage"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:maxLines="2"
-                    android:fontFamily="@font/open_sans"
-                    android:layout_marginTop="16dp"
-                    android:textSize="15sp"
-                    android:text="EN"
-                    android:textColor="#B6B6B6" />
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/star"/>
+                    <TextView
+                        android:id="@+id/tvRating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/open_sans_semibold"
+                        android:layout_marginLeft="10dp"
+                        android:text="8.5"
+                        android:textColor="#B6B6B6"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
