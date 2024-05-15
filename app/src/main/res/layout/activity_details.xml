@@ -145,6 +145,28 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/cabin_semibold"
+            android:text="Release Date"
+            android:textColor="@color/yellow"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/tvReleaseDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:fontFamily="@font/open_sans"
+            android:text="25th September 2024"
+            android:textColor="#9C9C9C"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/cabin_semibold"
             android:text="Plot"
             android:textColor="@color/yellow"
             android:textSize="22sp" />

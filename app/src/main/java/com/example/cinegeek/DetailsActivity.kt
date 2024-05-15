@@ -19,6 +19,9 @@ import com.example.models.MovieImages
 import com.example.models.Movies
 import com.example.models.Result
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.math.pow
 import kotlin.math.round
 
@@ -103,6 +106,11 @@ class DetailsActivity : AppCompatActivity() {
             {
                 binding?.tvTitle?.text= it.title
                 binding?.tvPlot?.text=it.overview
+                val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+                val date = inputFormat.parse(it.release_date)
+                val formattedDate = outputFormat.format(date)
+                binding?.tvReleaseDate?.text=formattedDate
                 Glide.with(this)
                     .load("https://image.tmdb.org/t/p/w500"+it.poster_path)
                     .into(binding?.ivCover!!)
