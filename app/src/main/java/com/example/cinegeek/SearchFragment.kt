@@ -19,9 +19,11 @@ import com.example.MoviesViewModel
 import com.example.cinegeek.databinding.FragmentExploreBinding
 import com.example.cinegeek.databinding.FragmentSearchBinding
 import com.example.models.Backdrop
+import com.example.models.MovieDetails
 import com.example.models.Movies
 import com.example.models.Result
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.Integer.min
 import java.util.Locale
 import java.util.Timer
 
@@ -130,29 +132,37 @@ class SearchFragment : Fragment() {
     }
 
     private fun setObservers() {
+        val movieDetailsList = mutableListOf<MovieDetails>()
         viewModel.searchResultsReponse.observe(viewLifecycleOwner) {
             if (it != null) {
                 Movies = it
                 Log.e("searchResult", "$it")
-                setUpSearchResultsRv()
-            }
-        }
-    }
 
-    private fun setUpSearchResultsRv() {
-        var searchResultsList : MutableList<Result> = arrayListOf()
+                if(Movies?.results?.isEmpty()==true)
+                {
+                    binding?.rvSearchResults?.visibility = View.GONE
+                    binding?.tvNA?.visibility = View.VISIBLE
+                }
 
-        if(Movies?.results != null) {
-            for (i in 0..Movies?.results!!.size - 1) {
-                try {
-                    searchResultsList.add(Movies?.results!![i])
-                } catch (e: Exception) {
-                    Log.e("error", e.toString())
+                for (i in 0..min(14,Movies?.results!!.size-1)) {
+                    viewModel.getMovieDetails(Movies?.results!![i]?.id.toString()!!)
                 }
             }
         }
 
-        val searchResultAdapter = SearchResultAdapter(requireContext(), searchResultsList)
+        viewModel.movieDetailsResponse.observe(viewLifecycleOwner) {
+            if (it != null) {
+                movieDetailsList.add(it)
+            }
+            if(movieDetailsList.size>0 && movieDetailsList.size == min(14,Movies?.results!!.size)) {
+                Log.e("movieDetailsList", "$movieDetailsList")
+                setUpSearchResultsRv(movieDetailsList)
+            }
+        }
+    }
+
+    private fun setUpSearchResultsRv(movieDetailsList: List<MovieDetails>) {
+        val searchResultAdapter = FavouritesListAdapter(requireContext(), movieDetailsList as MutableList<MovieDetails>)
 
         try {
             binding?.rvSearchResults?.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
