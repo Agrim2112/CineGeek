@@ -1,2 +1,1 @@
-<h1 align="center">Online Leave Application Android System</h1>
-## Admin
+<h1 align="center">CineGeek</h1>
