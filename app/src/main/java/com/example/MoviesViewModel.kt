@@ -41,12 +41,12 @@ class MoviesViewModel
     val popularMoviesResponse:LiveData<Resource<Movies>>
         get()=fetchPopularMovies
 
-    private val fetchTopRatedMovies=MutableLiveData<Movies>()
-    val topRatedMoviesResponse:LiveData<Movies>
+    private val fetchTopRatedMovies=MutableLiveData<Resource<Movies>>()
+    val topRatedMoviesResponse:LiveData<Resource<Movies>>
         get()=fetchTopRatedMovies
 
-    private val fetchUpcomingMovies=MutableLiveData<Movies>()
-    val upcomingMoviesResponse:LiveData<Movies>
+    private val fetchUpcomingMovies=MutableLiveData<Resource<Movies>>()
+    val upcomingMoviesResponse:LiveData<Resource<Movies>>
         get()=fetchUpcomingMovies
 
     private val fetchMovieDetails=MutableLiveData<MovieDetails>()
@@ -99,14 +99,21 @@ class MoviesViewModel
     }
     }
 
-    private fun getTopRatedMovies(){
+    private fun getTopRatedMovies() {
         viewModelScope.launch {
-            moviesRepository.getTopRatedMovies().let {response->
-                if(response.isSuccessful){
-                    fetchTopRatedMovies.postValue(response.body())
+            try {
+                fetchTopRatedMovies.value = Resource.loading()
+                val response = moviesRepository.getTopRatedMovies()
+                if (response.isSuccessful) {
+                    fetchTopRatedMovies.value = Resource.success(response.body()!!)
+                } else {
+                    fetchTopRatedMovies.value = Resource.empty()
                 }
-                else{
-                    Log.d("MoviesViewModel", "getTopRatedMovies: ${response.errorBody()}")
+            } catch (e: Exception) {
+                if (e is UnknownHostException) {
+                    fetchTopRatedMovies.value = Resource.offlineError()
+                } else {
+                    fetchTopRatedMovies.value = Resource.error(e)
                 }
             }
         }
@@ -114,12 +121,19 @@ class MoviesViewModel
 
     private fun getUpcomingMovies(){
         viewModelScope.launch {
-            moviesRepository.getUpcomingMovies().let {response->
-                if(response.isSuccessful){
-                    fetchUpcomingMovies.postValue(response.body())
+            try {
+                fetchUpcomingMovies.value = Resource.loading()
+                val response = moviesRepository.getUpcomingMovies()
+                if (response.isSuccessful) {
+                    fetchUpcomingMovies.value = Resource.success(response.body()!!)
+                } else {
+                    fetchUpcomingMovies.value = Resource.empty()
                 }
-                else{
-                    Log.d("MoviesViewModel", "getUpcomingMovies: ${response.errorBody()}")
+            } catch (e: Exception) {
+                if (e is UnknownHostException) {
+                    fetchUpcomingMovies.value = Resource.offlineError()
+                } else {
+                    fetchUpcomingMovies.value = Resource.error(e)
                 }
             }
         }

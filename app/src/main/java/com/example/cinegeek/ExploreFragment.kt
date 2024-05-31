@@ -181,28 +181,62 @@ class ExploreFragment : Fragment() {
         }
 
         viewModel.topRatedMoviesResponse.observe(viewLifecycleOwner) {
-            apiCallsFinished++
-            if (it != null) {
-                Movies = it
-                Log.e("setObservers", "$it")
-                setUpRv(R.id.rvTopRated)
+            when(it.status){
+                Resource.Status.LOADING -> {
+                Log.d("setObservers", "Loading")
+                binding?.loadingAnimation?.visibility = View.VISIBLE
+                binding?.llContent?.visibility=View.GONE
             }
-            if (apiCallsFinished == 3) {
+                Resource.Status.EMPTY -> {
+                Log.d("setObservers", "Empty")
+                binding?.loadingAnimation?.visibility = View.VISIBLE
+                binding?.llContent?.visibility=View.GONE
+            }
+                Resource.Status.SUCCESS -> {
+                Log.d("setObservers", "Success")
                 binding?.loadingAnimation?.visibility = View.GONE
                 binding?.llContent?.visibility=View.VISIBLE
+                Movies = it.data
+                Log.e("setObservers", "${it.data}")
+                setUpRv(R.id.rvTopRated)
+            }
+                Resource.Status.ERROR -> {
+                Log.e("setObservers", it.error.toString())
+                Toast.makeText(requireContext(),it.error.toString(),Toast.LENGTH_SHORT).show()
+            }
+                else -> {}
             }
         }
 
         viewModel.upcomingMoviesResponse.observe(viewLifecycleOwner) {
-            apiCallsFinished++
-            if (it != null) {
-                Movies = it
-                Log.e("setObservers", "$it")
-                setUpRv(R.id.rvUpcoming)
-            }
-            if (apiCallsFinished == 3) {
-                binding?.loadingAnimation?.visibility = View.GONE
-                binding?.llContent?.visibility=View.VISIBLE
+            when (it.status) {
+                Resource.Status.LOADING -> {
+                    Log.d("setObservers", "Loading")
+                    binding?.loadingAnimation?.visibility = View.VISIBLE
+                    binding?.llContent?.visibility = View.GONE
+                }
+
+                Resource.Status.EMPTY -> {
+                    Log.d("setObservers", "Empty")
+                    binding?.loadingAnimation?.visibility = View.VISIBLE
+                    binding?.llContent?.visibility = View.GONE
+                }
+
+                Resource.Status.SUCCESS -> {
+                    Log.d("setObservers", "Success")
+                    binding?.loadingAnimation?.visibility = View.GONE
+                    binding?.llContent?.visibility = View.VISIBLE
+                    Movies = it.data
+                    Log.e("setObservers", "${it.data}")
+                    setUpRv(R.id.rvUpcoming)
+                }
+
+                Resource.Status.ERROR -> {
+                    Log.e("setObservers", it.error.toString())
+                    Toast.makeText(requireContext(), it.error.toString(), Toast.LENGTH_SHORT).show()
+                }
+
+                else -> {}
             }
         }
     }
