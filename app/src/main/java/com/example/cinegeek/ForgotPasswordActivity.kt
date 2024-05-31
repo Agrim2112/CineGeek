@@ -19,7 +19,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
         firebaseAuth=FirebaseAuth.getInstance()
 
         binding?.btnSignup?.setOnClickListener(){
-            val email=binding?.etUsername?.text.toString()
+            val email=binding?.etEmail?.text.toString()
             if(email.isNotEmpty())
             {
                 firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener {

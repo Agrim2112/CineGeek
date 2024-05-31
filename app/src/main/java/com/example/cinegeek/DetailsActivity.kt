@@ -1,26 +1,24 @@
 package com.example.cinegeek
 
-import android.graphics.Movie
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.MoviesViewModel
 import com.example.cinegeek.databinding.ActivityDetailsBinding
 import com.example.models.Backdrop
 import com.example.models.Cast
-import com.example.models.FavouriteModel
+import com.example.models.UserFavouriteModel
 import com.example.models.MovieCast
 import com.example.models.MovieDetails
 import com.example.models.MovieImages
 import com.example.models.Movies
 import com.example.models.Result
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 import kotlin.math.pow
 import kotlin.math.round
@@ -53,13 +51,11 @@ class DetailsActivity : AppCompatActivity() {
         viewModel.checkFavourites(movieId!!)
 
 
-        val favouriteDetails = FavouriteModel(true, movieId)
-
         binding?.favoriteButton?.setOnCheckedChangeListener {_, isChecked ->
             if(isChecked)
-                viewModel.addToFavourites(favouriteDetails)
+                viewModel.addToFavourites(FirebaseAuth.getInstance().uid!!,movieId)
             else
-                viewModel.removeFromFavourites(favouriteDetails)
+                viewModel.removeFromFavourites(FirebaseAuth.getInstance().uid!!,movieId)
         }
 
         setObservers()

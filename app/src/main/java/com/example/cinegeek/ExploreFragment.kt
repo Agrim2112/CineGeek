@@ -13,11 +13,13 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.MoviesViewModel
 import com.example.cinegeek.databinding.FragmentExploreBinding
+import com.example.di.Resource
 import com.example.models.Movies
 import com.example.models.Result
 import com.example.models.Slider
@@ -151,15 +153,30 @@ class ExploreFragment : Fragment() {
 
     private fun setObservers() {
         viewModel.popularMoviesResponse.observe(viewLifecycleOwner) {
-            apiCallsFinished++
-            if (it != null) {
-                Movies = it
-                Log.e("setObservers", "$it")
-                setUpRv(R.id.rvPopularMovies)
-            }
-            if (apiCallsFinished == 3) {
-                binding?.loadingAnimation?.visibility = View.GONE
-                binding?.llContent?.visibility=View.VISIBLE
+            when(it.status){
+                Resource.Status.LOADING -> {
+                    Log.d("setObservers", "Loading")
+                    binding?.loadingAnimation?.visibility = View.VISIBLE
+                    binding?.llContent?.visibility=View.GONE
+                }
+                Resource.Status.EMPTY -> {
+                    Log.d("setObservers", "Empty")
+                    binding?.loadingAnimation?.visibility = View.VISIBLE
+                    binding?.llContent?.visibility=View.GONE
+                }
+                Resource.Status.SUCCESS -> {
+                    Log.d("setObservers", "Success")
+                    binding?.loadingAnimation?.visibility = View.GONE
+                    binding?.llContent?.visibility=View.VISIBLE
+                    Movies = it.data
+                    Log.e("setObservers", "${it.data}")
+                    setUpRv(R.id.rvPopularMovies)
+                }
+                Resource.Status.ERROR -> {
+                    Log.e("setObservers", it.error.toString())
+                    Toast.makeText(requireContext(),it.error.toString(),Toast.LENGTH_SHORT).show()
+                }
+                else -> {}
             }
         }
 

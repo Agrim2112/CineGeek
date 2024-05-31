@@ -7,6 +7,8 @@
     android:background="@color/blue"
     tools:context=".SignUpActivity">
 
+
+
     <TextView
         android:id="@+id/tvLogin"
         android:layout_width="match_parent"
@@ -33,7 +35,7 @@
         android:drawableLeft="@drawable/user"
         android:drawablePadding="8dp"
         android:fontFamily="@font/cabin_semibold"
-        android:hint="Email"
+        android:hint="Username"
         android:inputType="text"
         android:minHeight="48dp"
         android:paddingStart="15dp"
@@ -44,6 +46,28 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvLogin" />
+    <EditText
+        android:id="@+id/etEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="30dp"
+        android:background="@drawable/edittext_bg"
+        android:drawableLeft="@drawable/email"
+        android:drawablePadding="8dp"
+        android:fontFamily="@font/cabin_semibold"
+        android:hint="Email"
+        android:inputType="text"
+        android:minHeight="48dp"
+        android:paddingStart="15dp"
+        android:textColor="@color/white"
+        android:textColorHint="#979696"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etUsername" />
 
     <EditText
         android:id="@+id/etPassword"
@@ -65,7 +89,7 @@
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etUsername" />
+        app:layout_constraintTop_toBottomOf="@+id/etEmail" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnSignup"

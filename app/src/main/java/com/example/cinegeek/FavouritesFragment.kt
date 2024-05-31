@@ -1,19 +1,16 @@
 package com.example.cinegeek
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.MoviesViewModel
 import com.example.cinegeek.databinding.FragmentFavouritesBinding
-import com.example.models.FavouriteModel
+import com.example.models.UserFavouriteModel
 import com.example.models.MovieDetails
-import com.example.models.Movies
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -23,7 +20,7 @@ class FavouritesFragment : Fragment() {
     private val binding get() = _binding!!
     lateinit var viewModel : MoviesViewModel
     private var Movies : List<MovieDetails> = mutableListOf()
-    private var FavouritesList : List<FavouriteModel>?=null
+    private var FavouritesList : List<String>?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +56,7 @@ class FavouritesFragment : Fragment() {
                     }
                 }
                 for (favourite in FavouritesList!!) {
-                    viewModel.getMovieDetails(favourite.movieId)
+                    viewModel.getMovieDetails(favourite)
                 }
             }
         }

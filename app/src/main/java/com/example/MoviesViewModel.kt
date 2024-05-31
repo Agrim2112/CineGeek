@@ -1,24 +1,26 @@
 package com.example
 
 import android.util.Log
-import android.widget.MultiAutoCompleteTextView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.models.FavouriteModel
+import com.example.di.Resource
+import com.example.models.UserFavouriteModel
 import com.example.models.MovieCast
 import com.example.models.MovieDetails
+import com.example.models.MovieFavourites
 import com.example.models.MovieImages
 import com.example.models.Movies
 import com.example.repository.MoviesRepository
-import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,17 +29,16 @@ class MoviesViewModel
 {
     val database = FirebaseDatabase.getInstance()
     val myRef = database.getReference("favourites")
-
     private val isFavourite=MutableLiveData<Boolean>()
     val isFavouriteResponse:LiveData<Boolean>
         get()=isFavourite
 
-    private val fetchFavourites=MutableLiveData<List<FavouriteModel>>()
-    val fetchFavouritesResponse:LiveData<List<FavouriteModel>>
+    private val fetchFavourites=MutableLiveData<List<String>>()
+    val fetchFavouritesResponse:LiveData<List<String>>
         get()=fetchFavourites
 
-    private val fetchPopularMovies=MutableLiveData<Movies>()
-    val popularMoviesResponse:LiveData<Movies>
+    private val fetchPopularMovies=MutableLiveData<Resource<Movies>>()
+    val popularMoviesResponse:LiveData<Resource<Movies>>
         get()=fetchPopularMovies
 
     private val fetchTopRatedMovies=MutableLiveData<Movies>()
@@ -79,12 +80,20 @@ class MoviesViewModel
 
     private fun getPopularMovies(){
         viewModelScope.launch {
-            moviesRepository.getPopularMovies().let {response->
-                if(response.isSuccessful){
-                    fetchPopularMovies.postValue(response.body())
+            try {
+                fetchPopularMovies.value=Resource.loading()
+                val response = moviesRepository.getPopularMovies()
+                if (response.isSuccessful) {
+                    fetchPopularMovies.value = Resource.success(response.body()!!)
+                } else {
+                    fetchPopularMovies.value = Resource.empty()
                 }
-                else{
-                    Log.d("MoviesViewModel", "getPopularMovies: ${response.errorBody()}")
+            }
+            catch (e:Exception){
+                if (e is UnknownHostException) {
+                    fetchPopularMovies.value = Resource.offlineError()
+                } else {
+                    fetchPopularMovies.value = Resource.error(e)
                 }
             }
     }
@@ -182,65 +191,89 @@ class MoviesViewModel
         }
     }
 
-    fun addToFavourites(favouriteDetails:FavouriteModel) {
-        myRef.child(favouriteDetails.movieId).setValue(favouriteDetails)
-            .addOnCompleteListener {
-                Log.e("MoviesViewModel", "addToFavourites: ${it.isSuccessful}")
-            }
-            .addOnFailureListener {
-                Log.e("MoviesViewModel", "addToFavourites: ${it.message}")
-            }
+    fun addToFavourites(userID:String,movieId: String) {
+        viewModelScope.launch {
+            val userFav = database.getReference("UserFavourites").child(userID)
+            val movieFav = database.getReference("MovieFavourites").child(movieId)
+
+            userFav.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val currentMovies =
+                        snapshot.getValue(UserFavouriteModel::class.java)?.movieId ?: listOf()
+                    if (!currentMovies.contains(movieId)) {
+                        val updatedMovies = currentMovies + movieId
+                        userFav.setValue(UserFavouriteModel(updatedMovies))
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("MoviesViewModel", "onCancelled: ${error.message}")
+                }
+
+            })
+
+            movieFav.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val currentUsers =
+                        snapshot.getValue(MovieFavourites::class.java)?.userId ?: listOf()
+                    if(!currentUsers.contains(userID)) {
+                        val updatedUsers = currentUsers + userID
+                        movieFav.setValue(MovieFavourites(updatedUsers))
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("MoviesViewModel", "onCancelled: ${error.message}")
+                }
+
+            })
+        }
     }
 
-    fun removeFromFavourites(favouriteDetails: FavouriteModel) {
-//        viewModelScope.launch {
-//            myRef.addValueEventListener(object : ValueEventListener {
-//                override fun onDataChange(snapshot: DataSnapshot) {
-//                    for (data in snapshot.children) {
-//                        val fav = data.getValue(FavouriteModel::class.java)
-//                        if (fav != null) {
-//                            if (fav.movieId == favouriteDetails.movieId) {
-//                                myRef.child(data.key!!).removeValue()
-//                                    .addOnCompleteListener {
-//                                        Log.e("MoviesViewModel", "removeFromFavourites: ${it.isSuccessful}")
-//                                    }
-//                                    .addOnFailureListener {
-//                                        Log.e("MoviesViewModel", "removeFromFavourites: ${it.message}")
-//                                    }
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                override fun onCancelled(error: DatabaseError) {
-//                    Log.e("MoviesViewModel", "onCancelled: ${error.message}")
-//                }
-//            })
-//        }
+    fun removeFromFavourites(userID:String,movieId: String) {
+        viewModelScope.launch {
+            val userFav = database.getReference("UserFavourites").child(userID)
+            val movieFav = database.getReference("MovieFavourites").child(movieId)
 
-        myRef.child(favouriteDetails.movieId).removeValue()
-            .addOnCompleteListener {
-                Log.e("MoviesViewModel", "removeFromFavourites: ${it.isSuccessful}")
-            }
-            .addOnFailureListener {
-                Log.e("MoviesViewModel", "removeFromFavourites: ${it.message}")
-            }
+            userFav.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val currentMovies =
+                        snapshot.getValue(UserFavouriteModel::class.java)?.movieId ?: listOf()
+                    val updatedMovies = currentMovies.filter { it != movieId }
+                    userFav.setValue(UserFavouriteModel(updatedMovies))
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("MoviesViewModel", "onCancelled: ${error.message}")
+                }
+
+            })
+
+            movieFav.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val currentUsers =
+                        snapshot.getValue(MovieFavourites::class.java)?.userId ?: listOf()
+                    val updatedUsers = currentUsers.filter { it != userID }
+                    movieFav.setValue(MovieFavourites(updatedUsers))
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("MoviesViewModel", "onCancelled: ${error.message}")
+                }
+
+            })
+        }
     }
 
     fun getFavourites(){
         viewModelScope.launch {
-            myRef.addValueEventListener(object : ValueEventListener {
+            val userFav = database.getReference("UserFavourites").child(FirebaseAuth.getInstance().uid!!)
+            userFav.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val list = mutableListOf<FavouriteModel>()
-                    for (data in snapshot.children) {
-                        val fav = data.getValue(FavouriteModel::class.java)
-                        if (fav != null) {
-                            list.add(fav)
-                        }
+                    val userFavouriteModel = snapshot.getValue(UserFavouriteModel::class.java)
+                    val movieIds = userFavouriteModel?.movieId ?: listOf()
+                    fetchFavourites.postValue(movieIds)
                     }
-                    Log.e("MoviesViewModel", "onDataChange: $list")
-                    fetchFavourites.postValue(list)
-                }
 
                 override fun onCancelled(error: DatabaseError) {
                     Log.e("MoviesViewModel", "onCancelled: ${error.message}")
@@ -251,19 +284,13 @@ class MoviesViewModel
 
     fun checkFavourites(movieId:String){
         viewModelScope.launch {
-            myRef.addValueEventListener(object : ValueEventListener {
+            val movieFav = database.getReference("UserFavourites").child(FirebaseAuth.getInstance().uid!!)
+
+            movieFav.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    isFavourite.postValue(false)
-                    for (data in snapshot.children) {
-                        val fav = data.getValue(FavouriteModel::class.java)
-                        Log.e("MoviesViewModel", "onDataChange: $fav")
-                        if (fav != null) {
-                            if (fav.movieId == movieId) {
-                                Log.e("MoviesViewModel", "onDataChange: ${fav.movieId}")
-                                isFavourite.postValue(true)
-                            }
-                        }
-                    }
+                    val userFavouriteModel = snapshot.getValue(UserFavouriteModel::class.java)
+                    val movieIds = userFavouriteModel?.movieId ?: listOf()
+                    isFavourite.postValue(movieIds.contains(movieId))
                 }
 
                 override fun onCancelled(error: DatabaseError) {

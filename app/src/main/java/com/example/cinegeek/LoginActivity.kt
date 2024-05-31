@@ -117,7 +117,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding?.btnSignup?.setOnClickListener(){
-            val email=binding?.etUsername?.text.toString()
+            val email=binding?.etEmail?.text.toString()
             val pwd=binding?.etPassword?.text.toString()
 
             if(email.isNotEmpty() && pwd.isNotEmpty()){

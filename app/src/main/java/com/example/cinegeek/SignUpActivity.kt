@@ -30,6 +30,8 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.OAuthProvider
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.Arrays
@@ -40,6 +42,7 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var callbackManager: CallbackManager
+    private var databaseReference : DatabaseReference?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding=ActivitySignUpBinding.inflate(layoutInflater)
@@ -113,14 +116,23 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         binding?.btnSignup?.setOnClickListener(){
-            val email=binding.etUsername.text.toString()
+            val email=binding.etEmail.text.toString()
             val pwd = binding.etPassword.text.toString()
+            val user = binding.etUsername.text.toString()
 
-            if(email.isNotEmpty() && pwd.isNotEmpty())
+            if(email.isNotEmpty() && pwd.isNotEmpty() && user.isNotEmpty())
             {
                 firebaseAuth.createUserWithEmailAndPassword(email,pwd).addOnCompleteListener {
                     if(it.isSuccessful)
                     {
+                        val map = mapOf<String,String>(
+                            "username" to user,
+                            "email" to email,
+                            "pfp" to "",
+                            "uid" to firebaseAuth!!.uid!!
+                        )
+                        databaseReference = FirebaseDatabase.getInstance().getReference("Users")
+                        databaseReference!!.child(firebaseAuth!!.uid!!).updateChildren(map)
                         val intent=Intent(this,DashboardActivity::class.java)
                         startActivity(intent)
                     }

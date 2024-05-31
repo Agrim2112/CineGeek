@@ -29,12 +29,10 @@ class DashboardActivity : AppCompatActivity() {
     replaceFragment(ExploreFragment())
 
         binding.bottomnavbar.setOnItemSelectedListener { item ->
-            when(item.itemId) {
-                R.id.explore -> replaceFragment(ExploreFragment())
-                R.id.cart -> replaceFragment(CartFragment())
-                R.id.favourites -> replaceFragment(FavouritesFragment())
-                R.id.profile -> replaceFragment(ProfileFragment())
-            }
+            if (item.itemId == R.id.explore) replaceFragment(ExploreFragment())
+            else if (item.itemId == R.id.cart) replaceFragment(CartFragment())
+            else if (item.itemId == R.id.favourites) replaceFragment(FavouritesFragment())
+            else if (item.itemId == R.id.profile) replaceFragment(ProfileFragment())
             true
         }
 }
