@@ -12,6 +12,7 @@ import com.example.models.MovieDetails
 import com.example.models.MovieFavourites
 import com.example.models.MovieImages
 import com.example.models.Movies
+import com.example.models.User
 import com.example.repository.MoviesRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -32,6 +33,10 @@ class MoviesViewModel
     private val isFavourite=MutableLiveData<Boolean>()
     val isFavouriteResponse:LiveData<Boolean>
         get()=isFavourite
+
+    private val MatchUserList=MutableLiveData<List<User>>()
+    val MatchUserListResponse:LiveData<List<User>>
+        get()=MatchUserList
 
     private val fetchFavourites=MutableLiveData<List<String>>()
     val fetchFavouritesResponse:LiveData<List<String>>
@@ -96,7 +101,7 @@ class MoviesViewModel
                     fetchPopularMovies.value = Resource.error(e)
                 }
             }
-    }
+        }
     }
 
     private fun getTopRatedMovies() {
@@ -287,7 +292,7 @@ class MoviesViewModel
                     val userFavouriteModel = snapshot.getValue(UserFavouriteModel::class.java)
                     val movieIds = userFavouriteModel?.movieId ?: listOf()
                     fetchFavourites.postValue(movieIds)
-                    }
+                }
 
                 override fun onCancelled(error: DatabaseError) {
                     Log.e("MoviesViewModel", "onCancelled: ${error.message}")
@@ -314,4 +319,38 @@ class MoviesViewModel
         }
     }
 
+    fun getUserMatchList(movieId:String){
+        viewModelScope.launch {
+            val movieFav = database.getReference("MovieFavourites").child(movieId)
+            movieFav.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val users = snapshot.getValue(MovieFavourites::class.java)
+                    val userListIds = users?.userId
+
+                    if (userListIds != null) {
+                        val userList= mutableListOf<User>()
+                        for(user in userListIds){
+                            val userId = database.getReference("Users").child(user)
+                            userId.addValueEventListener(object : ValueEventListener{
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    val userData = snapshot.getValue(User::class.java)
+                                    if(userData?.uid!= FirebaseAuth.getInstance().currentUser?.uid)
+                                    userList.add(userData!!)
+                                    MatchUserList.postValue(userList)
+                                }
+
+                                override fun onCancelled(error: DatabaseError) {
+                                    Log.e("MoviesViewModel", "onCancelled: ${error.message}")
+                                }
+                            })
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("MoviesViewModel", "onCancelled: ${error.message}")
+                }
+            })
+        }
+    }
 }

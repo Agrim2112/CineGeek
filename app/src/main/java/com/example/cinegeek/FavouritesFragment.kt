@@ -49,6 +49,8 @@ class FavouritesFragment : Fragment() {
                     if (movieDetails != null) {
                         Movies = Movies.plus(movieDetails)
                         if (Movies.size == FavouritesList!!.size) {
+                            binding?.rvFavourites?.visibility=View.VISIBLE
+                            binding?.loadingAnimation?.visibility=View.GONE
                             val favouritesListAdapter = FavouritesListAdapter(requireContext(), Movies as MutableList<MovieDetails>)
                             binding?.rvFavourites?.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
                             binding?.rvFavourites?.adapter = favouritesListAdapter

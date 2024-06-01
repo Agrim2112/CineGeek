@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.cinegeek.databinding.ActivitySignUpBinding
+import com.example.models.User
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -42,7 +43,6 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var callbackManager: CallbackManager
-    private var databaseReference : DatabaseReference?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding=ActivitySignUpBinding.inflate(layoutInflater)
@@ -119,20 +119,22 @@ class SignUpActivity : AppCompatActivity() {
             val email=binding.etEmail.text.toString()
             val pwd = binding.etPassword.text.toString()
             val user = binding.etUsername.text.toString()
+            val name = binding.etName.text.toString()
 
-            if(email.isNotEmpty() && pwd.isNotEmpty() && user.isNotEmpty())
+            if(email.isNotEmpty() && pwd.isNotEmpty() && user.isNotEmpty() && name.isNotEmpty())
             {
                 firebaseAuth.createUserWithEmailAndPassword(email,pwd).addOnCompleteListener {
                     if(it.isSuccessful)
                     {
                         val map = mapOf<String,String>(
+                            "name" to name,
                             "username" to user,
                             "email" to email,
                             "pfp" to "",
                             "uid" to firebaseAuth!!.uid!!
                         )
-                        databaseReference = FirebaseDatabase.getInstance().getReference("Users")
-                        databaseReference!!.child(firebaseAuth!!.uid!!).updateChildren(map)
+                        val databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseAuth!!.uid!!)
+                        databaseReference.setValue(User(name,user,email,"",firebaseAuth!!.uid!!))
                         val intent=Intent(this,DashboardActivity::class.java)
                         startActivity(intent)
                     }

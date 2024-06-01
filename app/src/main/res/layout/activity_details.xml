@@ -6,6 +6,19 @@
     android:background="@color/blue"
     android:layout_height="match_parent"
     tools:context=".DetailsActivity">
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/loadingAnimation"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:visibility="visible"
+        app:lottie_loop="true"
+        app:lottie_autoPlay="true"
+        app:lottie_rawRes="@raw/loading_animation"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -16,6 +29,7 @@
         tools:ignore="SpeakableTextPresentCheck">
 
     <LinearLayout
+        android:id="@+id/llContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -72,9 +86,31 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
+            android:id="@+id/llMatch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/bg"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvMatch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/open_sans_bold"
+                android:paddingHorizontal="10dp"
+                android:text="Match"
+                android:textColor="@color/blue"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="15dp"
             android:layout_marginLeft="20dp"
             android:orientation="horizontal">
             <LinearLayout
@@ -125,6 +161,7 @@
                     android:textColor="@color/white"
                     android:textSize="17sp" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -138,6 +175,9 @@
             </LinearLayout>
 
         </LinearLayout>
+
+
+
 
         <TextView
             android:layout_width="wrap_content"

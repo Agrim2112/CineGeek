@@ -155,6 +155,8 @@ class SearchFragment : Fragment() {
                 movieDetailsList.add(it)
             }
             if(movieDetailsList.size>0 && movieDetailsList.size == min(14,Movies?.results!!.size)) {
+                binding?.llContent?.visibility=View.VISIBLE
+                binding?.loadingAnimation?.visibility=View.GONE
                 Log.e("movieDetailsList", "$movieDetailsList")
                 setUpSearchResultsRv(movieDetailsList)
             }

@@ -1,8 +1,10 @@
 package com.example.cinegeek
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -51,9 +53,17 @@ class DetailsActivity : AppCompatActivity() {
         viewModel.checkFavourites(movieId!!)
 
 
+        binding?.llMatch?.setOnClickListener(){
+            val intent= Intent(this,MatchActivity::class.java)
+            intent.putExtra("movieId",movieId)
+            startActivity(intent)
+        }
+
         binding?.favoriteButton?.setOnCheckedChangeListener {_, isChecked ->
-            if(isChecked)
-                viewModel.addToFavourites(FirebaseAuth.getInstance().uid!!,movieId)
+            if(isChecked) {
+                viewModel.addToFavourites(FirebaseAuth.getInstance().uid!!, movieId)
+                Log.d("Display Name",FirebaseAuth.getInstance().currentUser?.displayName!!)
+            }
             else
                 viewModel.removeFromFavourites(FirebaseAuth.getInstance().uid!!,movieId)
         }
@@ -100,6 +110,8 @@ class DetailsActivity : AppCompatActivity() {
         viewModel.movieDetailsResponse.observe(this,){
             if(it!=null)
             {
+                binding?.llContent?.visibility=View.VISIBLE
+                binding?.loadingAnimation?.visibility=View.GONE
                 binding?.tvTitle?.text= it.title
                 binding?.tvPlot?.text=it.overview
                 val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())

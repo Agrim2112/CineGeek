@@ -15,6 +15,7 @@
             android:id="@+id/loadingAnimation"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:visibility="visible"
             app:lottie_loop="true"
             app:lottie_autoPlay="true"
             app:lottie_rawRes="@raw/loading_animation"
@@ -61,6 +62,7 @@
                 android:id="@+id/llContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:orientation="vertical">
 
 
