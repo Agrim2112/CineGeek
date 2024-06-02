@@ -269,4 +269,6 @@ class ExploreFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+
 }

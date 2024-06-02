@@ -2,12 +2,15 @@ package com.example.cinegeek
 
 import android.app.ProgressDialog
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.Gravity
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
@@ -15,8 +18,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.MoviesViewModel
 import com.example.cinegeek.databinding.ActivityChatBinding
+import com.example.models.Chat
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -25,7 +32,8 @@ class ChatActivity : AppCompatActivity() {
     lateinit var viewModel : MoviesViewModel
     private  lateinit var binding: ActivityChatBinding
     lateinit var receiverId : String
-
+    lateinit var profilePic : String
+    lateinit var chatList:MutableList<Chat>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChatBinding.inflate(layoutInflater)
@@ -37,13 +45,8 @@ class ChatActivity : AppCompatActivity() {
         receiverId = receivedIntent.getStringExtra("receiverId").toString()
 
         viewModel.getUser(receiverId!!)
+        viewModel.getChat(FirebaseAuth.getInstance().currentUser?.uid!!,receiverId!!)
 
-        val gallery=registerForActivityResult(
-            ActivityResultContracts.GetContent(),
-            ActivityResultCallback {
-
-            }
-        )
 
         binding?.etMessage?.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
@@ -110,6 +113,30 @@ class ChatActivity : AppCompatActivity() {
             if(it!=null)
             {
                 binding?.tvReceiver?.text=it.name
+                profilePic=it.pfp
+            }
+        }
+
+        viewModel.getChatsResponse.observe(this){
+            if (it!=null)
+            {
+                chatList= it.toMutableList()
+                Log.d("chats",it.toString())
+                val llm=LinearLayoutManager(this)
+                llm.stackFromEnd=true
+                binding?.rvChats?.layoutManager=llm
+                val chatAdapter=ChatAdapter(this,chatList,profilePic)
+                binding?.rvChats?.adapter=chatAdapter
+//                binding?.rvChats?.post {
+//                    binding?.rvChats?.scrollToPosition(chatList.size - 1)
+//                }
+                chatAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                        binding?.rvChats?.post {
+                            binding?.rvChats?.smoothScrollToPosition(chatAdapter.itemCount - 1)
+                        }
+                    }
+                })
             }
         }
     }

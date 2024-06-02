@@ -44,7 +44,9 @@ class LoginActivity : AppCompatActivity() {
             if (pendingResultTask != null) {
                 pendingResultTask
                     .addOnSuccessListener {
-                        startActivity(Intent(this, DashboardActivity::class.java))
+                        val intent=Intent(this, DashboardActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
                     }
                     .addOnFailureListener {
                         Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
@@ -53,7 +55,9 @@ class LoginActivity : AppCompatActivity() {
                 firebaseAuth
                     .startActivityForSignInWithProvider(this, provider.build())
                     .addOnSuccessListener {
-                        startActivity(Intent(this, DashboardActivity::class.java))
+                        val intent=Intent(this, DashboardActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
                     }
                     .addOnFailureListener {
                         Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
@@ -64,7 +68,9 @@ class LoginActivity : AppCompatActivity() {
             firebaseUser
                 .startActivityForLinkWithProvider(this, provider.build())
                 .addOnSuccessListener {
-                    startActivity(Intent(this, DashboardActivity::class.java))
+                    val intent=Intent(this, DashboardActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
                 }
                 .addOnFailureListener {
                     Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
@@ -123,8 +129,9 @@ class LoginActivity : AppCompatActivity() {
             if(email.isNotEmpty() && pwd.isNotEmpty()){
                 firebaseAuth.signInWithEmailAndPassword(email,pwd).addOnCompleteListener {
                     if (it.isSuccessful) {
-                    val intent = Intent(this, DashboardActivity::class.java)
-                    startActivity(intent)
+                        val intent = Intent(this, DashboardActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
                     } else {
                         Toast.makeText(this, it.exception.toString(), Toast.LENGTH_SHORT).show()
                     }
@@ -164,12 +171,14 @@ class LoginActivity : AppCompatActivity() {
 
     private fun updateUI(account: GoogleSignInAccount?) {
         val intent = Intent(this, DashboardActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
     }
 
     private fun updateUI2(user: FirebaseUser?) {
         if (user != null) {
             val intent = Intent(this, DashboardActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
         }
     }

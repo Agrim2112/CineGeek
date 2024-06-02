@@ -36,7 +36,7 @@ import javax.inject.Inject
 class MoviesViewModel
 @Inject constructor(private val moviesRepository: MoviesRepository): ViewModel()
 {
-    val currentUser=FirebaseAuth.getInstance().currentUser?.uid!!
+    val currentUser=FirebaseAuth.getInstance().currentUser?.uid
     val database = FirebaseDatabase.getInstance()
     val myRef = database.getReference("favourites")
     private val isFavourite=MutableLiveData<Boolean>()
@@ -50,6 +50,10 @@ class MoviesViewModel
     private val getUser=MutableLiveData<UserModel>()
     val getUserResponse:LiveData<UserModel>
         get()=getUser
+
+    private val getChats=MutableLiveData<List<Chat>>()
+    val getChatsResponse:LiveData<List<Chat>>
+        get()=getChats
 
     private val fetchFavourites=MutableLiveData<List<String>>()
     val fetchFavouritesResponse:LiveData<List<String>>
@@ -392,7 +396,7 @@ class MoviesViewModel
             .addOnCompleteListener{
                 if (it.isSuccessful){
                     val chatListReference=database.getReference("ChatList")
-                        .child(currentUser)
+                        .child(currentUser!!)
                         .child(receiverId)
 
                     chatListReference.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -451,5 +455,31 @@ class MoviesViewModel
             .addOnFailureListener {
                 Log.e("ViewModel",it.message.toString())
             }
+    }
+
+    fun getChat(senderId:String,receiverId: String) {
+        viewModelScope.launch {
+            val chatReference = database.getReference("Chat")
+            val chatList= mutableListOf<Chat>()
+
+            chatReference.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    chatList.clear()
+                    for(chat in snapshot.children){
+                        val chats = chat.getValue(Chat::class.java)
+
+                        if(chat!=null && (chats?.receiver==senderId && chats?.sender==receiverId) || (chats?.receiver==receiverId && chats?.sender==senderId)){
+                            chatList.add(chats!!)
+                        }
+                    }
+                    getChats.postValue(chatList)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("MoviesViewModel", "onCancelled: ${error.message}")
+                }
+
+            })
+        }
     }
 }

@@ -48,7 +48,9 @@ class SignUpActivity : AppCompatActivity() {
             if (pendingResultTask != null) {
                 pendingResultTask
                     .addOnSuccessListener {
-                        startActivity(Intent(this, DashboardActivity::class.java))
+                        val intent=Intent(this, DashboardActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
                     }
                     .addOnFailureListener {
                         Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
@@ -57,7 +59,9 @@ class SignUpActivity : AppCompatActivity() {
                 firebaseAuth
                     .startActivityForSignInWithProvider(this, provider.build())
                     .addOnSuccessListener {
-                        startActivity(Intent(this, DashboardActivity::class.java))
+                        val intent=Intent(this, DashboardActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
                     }
                     .addOnFailureListener {
                         Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
@@ -120,7 +124,8 @@ class SignUpActivity : AppCompatActivity() {
                     {
                         val databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseAuth!!.uid!!)
                         databaseReference.setValue(UserModel(name,user,email,"",firebaseAuth!!.uid!!))
-                        val intent=Intent(this,DashboardActivity::class.java)
+                        val intent=Intent(this, DashboardActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
                     }
                     else

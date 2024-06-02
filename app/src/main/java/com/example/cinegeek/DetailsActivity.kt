@@ -52,7 +52,6 @@ class DetailsActivity : AppCompatActivity() {
         viewModel.getMovieImages(movieId!!)
         viewModel.checkFavourites(movieId!!)
 
-
         binding?.llMatch?.setOnClickListener(){
             val intent= Intent(this,MatchActivity::class.java)
             intent.putExtra("movieId",movieId)
@@ -61,16 +60,18 @@ class DetailsActivity : AppCompatActivity() {
 
         binding?.favoriteButton?.setOnCheckedChangeListener {_, isChecked ->
             if(isChecked) {
-                viewModel.addToFavourites(FirebaseAuth.getInstance().uid!!, movieId)
-                Log.d("Display Name",FirebaseAuth.getInstance().currentUser?.displayName!!)
+                FirebaseAuth.getInstance().currentUser?.let { currentUser ->
+                    viewModel.addToFavourites(currentUser.uid, movieId)
+                }
             }
             else
-                viewModel.removeFromFavourites(FirebaseAuth.getInstance().uid!!,movieId)
+                FirebaseAuth.getInstance().currentUser?.let { currentUser ->
+                    viewModel.removeFromFavourites(currentUser.uid, movieId)
+                }
         }
 
         setObservers()
     }
-
     private fun setObservers() {
 
 
