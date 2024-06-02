@@ -1,24 +1,32 @@
 package com.example
 
+import android.net.Uri
+import android.os.Message
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.di.Resource
+import com.example.models.Chat
 import com.example.models.UserFavouriteModel
 import com.example.models.MovieCast
 import com.example.models.MovieDetails
 import com.example.models.MovieFavourites
 import com.example.models.MovieImages
 import com.example.models.Movies
-import com.example.models.User
+import com.example.models.UserModel
 import com.example.repository.MoviesRepository
+import com.google.android.gms.tasks.Continuation
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageTask
+import com.google.firebase.storage.UploadTask
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.net.UnknownHostException
@@ -28,15 +36,20 @@ import javax.inject.Inject
 class MoviesViewModel
 @Inject constructor(private val moviesRepository: MoviesRepository): ViewModel()
 {
+    val currentUser=FirebaseAuth.getInstance().currentUser?.uid!!
     val database = FirebaseDatabase.getInstance()
     val myRef = database.getReference("favourites")
     private val isFavourite=MutableLiveData<Boolean>()
     val isFavouriteResponse:LiveData<Boolean>
         get()=isFavourite
 
-    private val MatchUserList=MutableLiveData<List<User>>()
-    val MatchUserListResponse:LiveData<List<User>>
+    private val MatchUserList=MutableLiveData<List<UserModel>>()
+    val MatchUserListResponse:LiveData<List<UserModel>>
         get()=MatchUserList
+
+    private val getUser=MutableLiveData<UserModel>()
+    val getUserResponse:LiveData<UserModel>
+        get()=getUser
 
     private val fetchFavourites=MutableLiveData<List<String>>()
     val fetchFavouritesResponse:LiveData<List<String>>
@@ -328,14 +341,14 @@ class MoviesViewModel
                     val userListIds = users?.userId
 
                     if (userListIds != null) {
-                        val userList= mutableListOf<User>()
+                        val userList= mutableListOf<UserModel>()
                         for(user in userListIds){
                             val userId = database.getReference("Users").child(user)
                             userId.addValueEventListener(object : ValueEventListener{
                                 override fun onDataChange(snapshot: DataSnapshot) {
-                                    val userData = snapshot.getValue(User::class.java)
+                                    val userData = snapshot.getValue(UserModel::class.java)
                                     if(userData?.uid!= FirebaseAuth.getInstance().currentUser?.uid)
-                                    userList.add(userData!!)
+                                        userList.add(userData!!)
                                     MatchUserList.postValue(userList)
                                 }
 
@@ -352,5 +365,91 @@ class MoviesViewModel
                 }
             })
         }
+    }
+
+    fun getUser(userID: String){
+        val userReference=database.getReference("Users").child(userID)
+        userReference.addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val user = snapshot.getValue(UserModel::class.java)
+                getUser.postValue(user!!)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("MoviesViewModel", "onCancelled: ${error.message}")
+            }
+
+        })
+    }
+
+    fun sendMessage(receiverId:String,message: String,url:String=""){
+        val chatReference=database.getReference("Chat")
+        val messageId= database.reference.push().key
+
+        chatReference
+            .child(messageId!!)
+            .setValue(Chat(FirebaseAuth.getInstance().currentUser?.uid!!,message,receiverId,false,url,messageId))
+            .addOnCompleteListener{
+                if (it.isSuccessful){
+                    val chatListReference=database.getReference("ChatList")
+                        .child(currentUser)
+                        .child(receiverId)
+
+                    chatListReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if(!snapshot.exists()){
+                                chatListReference.child("id").setValue(receiverId)
+                            }
+
+                            val chatListReceiverReference=database.getReference("ChatList")
+                                .child(receiverId)
+                                .child(currentUser)
+
+                            chatListReceiverReference.child("id").setValue(currentUser)
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+
+                        }
+
+                    })
+
+                    chatListReference.child("id").setValue(receiverId)
+                    val reference = database.reference.child("Users").child(currentUser)
+                }
+            }
+    }
+
+    fun sendImageMessage(receiverId: String,data:Uri){
+        val storageReference = FirebaseStorage.getInstance().reference.child("Chat Image")
+        val messageId = database.reference.push().key
+        val filePath = storageReference.child("$messageId.png")
+        val uploadTask = filePath.putFile(data)
+
+        uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot,Task<Uri>> {
+            if(!it.isSuccessful){
+                it.exception?.let {
+                    throw it
+                }
+            }
+
+            return@Continuation filePath.downloadUrl
+        })
+            .addOnCompleteListener{
+                if(it.isSuccessful){
+                    val downloadUrl = it.result
+                    val url=downloadUrl.toString()
+
+                    val chatReference=database.getReference("Chat")
+                    val messageId= database.reference.push().key
+
+                    chatReference
+                        .child(messageId!!)
+                        .setValue(Chat(FirebaseAuth.getInstance().currentUser?.uid!!,"Image",receiverId,false,url,messageId))
+                }
+            }
+            .addOnFailureListener {
+                Log.e("ViewModel",it.message.toString())
+            }
     }
 }

@@ -17,6 +17,10 @@
         android:theme="@style/Theme.CineGeek"
         tools:targetApi="31">
         <activity
+            android:name=".ChatActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+        <activity
             android:name=".MatchActivity"
             android:exported="false" />
         <activity

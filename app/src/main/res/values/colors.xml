@@ -6,4 +6,6 @@
     <color name="yellow">#FFC107</color>
     <color name="orange">#FF7427</color>
     <color name="blue">#252836</color>
+    <color name="grey">#B6B6B6</color>
+    <color name="cyan">#16CDCD</color>
 </resources>

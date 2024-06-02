@@ -1,21 +1,14 @@
 package com.example.cinegeek
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.MoviesViewModel
 import com.example.cinegeek.databinding.ItemProfileBinding
-import com.example.cinegeek.databinding.ItemSearchResultBinding
-import com.example.models.MovieDetails
-import com.example.models.Result
-import com.example.models.User
-import kotlin.math.pow
-import kotlin.math.round
+import com.example.models.UserModel
 
-class MatchAdapter(private val context: Context, private val UserList: MutableList<User>) : RecyclerView.Adapter<MatchAdapter.ViewHolder>() {
+class MatchAdapter(private val context: Context, private val UserList: MutableList<UserModel>) : RecyclerView.Adapter<MatchAdapter.ViewHolder>() {
 
     lateinit var viewModel : MoviesViewModel
     class ViewHolder(binding: ItemProfileBinding) : RecyclerView.ViewHolder(binding.root){
@@ -50,7 +43,9 @@ class MatchAdapter(private val context: Context, private val UserList: MutableLi
         holder?.name?.text=trimmedText
 
         holder.itemView.setOnClickListener{
-
+            val intent= Intent(context,ChatActivity::class.java)
+            intent.putExtra("receiverId",model.uid)
+            context.startActivity(intent)
         }
 
 
