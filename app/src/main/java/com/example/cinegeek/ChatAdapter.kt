@@ -20,10 +20,20 @@ import com.example.models.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.makeramen.roundedimageview.RoundedImageView
 
-class ChatAdapter(private val context: Context, private val chatList: MutableList<Chat>,val imageUrl:String) : RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
+class ChatAdapter(private val context: Context, private val chatList: MutableList<Chat>,val imageUrl:String,private val onMessageSeen: (Chat) -> Unit) : RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
 
     lateinit var viewModel : MoviesViewModel
     val currentUser =FirebaseAuth.getInstance().currentUser?.uid!!
+    var lastSeenMessage:Chat?=null
+    init {
+        for (i in chatList.size - 1 downTo 0) {
+            val chat = chatList[i]
+            if (chat.sender == currentUser && chat.seen==true) {
+                lastSeenMessage = chat
+                break
+            }
+        }
+    }
     class ViewHolder(itemView:View) : RecyclerView.ViewHolder(itemView){
         val profilePic=itemView.findViewById<RoundedImageView>(R.id.ivLeftProfilePic)
         val message=itemView.findViewById<TextView>(R.id.tvMessage)
@@ -48,6 +58,12 @@ class ChatAdapter(private val context: Context, private val chatList: MutableLis
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val model = chatList[position]
+
+        onMessageSeen(model)
+
+        if(model==lastSeenMessage){
+            holder?.seen?.visibility=View.VISIBLE
+        }
 
         if(model.message.equals("Image") && !model.url.equals("")){
             holder?.message?.visibility=View.GONE

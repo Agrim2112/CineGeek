@@ -24,6 +24,7 @@ import com.example.MoviesViewModel
 import com.example.cinegeek.databinding.ActivityChatBinding
 import com.example.models.Chat
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -32,7 +33,7 @@ class ChatActivity : AppCompatActivity() {
     lateinit var viewModel : MoviesViewModel
     private  lateinit var binding: ActivityChatBinding
     lateinit var receiverId : String
-    lateinit var profilePic : String
+    var profilePic : String?=null
     lateinit var chatList:MutableList<Chat>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +48,10 @@ class ChatActivity : AppCompatActivity() {
         viewModel.getUser(receiverId!!)
         viewModel.getChat(FirebaseAuth.getInstance().currentUser?.uid!!,receiverId!!)
 
+
+        binding?.btnBack?.setOnClickListener(){
+            onBackPressed()
+        }
 
         binding?.etMessage?.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
@@ -125,7 +130,16 @@ class ChatActivity : AppCompatActivity() {
                 val llm=LinearLayoutManager(this)
                 llm.stackFromEnd=true
                 binding?.rvChats?.layoutManager=llm
-                val chatAdapter=ChatAdapter(this,chatList,profilePic)
+                val chatAdapter=ChatAdapter(this,chatList,profilePic!!){
+                        chat ->
+                    val currentUser=FirebaseAuth.getInstance().currentUser?.uid!!
+                    if (chat.sender != currentUser && !chat.seen) {
+                        // The current user is the receiver of the message and the message has not been seen
+                        // Update the seen field in the database
+                        val chatReference = FirebaseDatabase.getInstance().getReference("Chat")
+                        chatReference.child(chat.messageId).child("seen").setValue(true)
+                    }
+                }
                 binding?.rvChats?.adapter=chatAdapter
 //                binding?.rvChats?.post {
 //                    binding?.rvChats?.scrollToPosition(chatList.size - 1)
@@ -155,5 +169,13 @@ class ChatActivity : AppCompatActivity() {
 
             }
         }
+    }
+
+    override fun onBackPressed() {
+        // Refresh the chat list
+        viewModel.getChatList()
+
+        // Call the super method to handle the back button press
+        super.onBackPressed()
     }
 }

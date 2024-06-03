@@ -9,12 +9,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.di.Resource
 import com.example.models.Chat
+import com.example.models.ChatList
 import com.example.models.UserFavouriteModel
 import com.example.models.MovieCast
 import com.example.models.MovieDetails
 import com.example.models.MovieFavourites
 import com.example.models.MovieImages
 import com.example.models.Movies
+import com.example.models.ReceiverChatList
 import com.example.models.UserModel
 import com.example.repository.MoviesRepository
 import com.google.android.gms.tasks.Continuation
@@ -34,54 +36,60 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MoviesViewModel
-@Inject constructor(private val moviesRepository: MoviesRepository): ViewModel()
-{
-    val currentUser=FirebaseAuth.getInstance().currentUser?.uid
+@Inject constructor(private val moviesRepository: MoviesRepository): ViewModel() {
+    val currentUser = FirebaseAuth.getInstance().currentUser?.uid
     val database = FirebaseDatabase.getInstance()
     val myRef = database.getReference("favourites")
-    private val isFavourite=MutableLiveData<Boolean>()
-    val isFavouriteResponse:LiveData<Boolean>
-        get()=isFavourite
+    private var chatListEventListener: ValueEventListener? = null
+    private var userFavEventListener:ValueEventListener? = null
 
-    private val MatchUserList=MutableLiveData<List<UserModel>>()
-    val MatchUserListResponse:LiveData<List<UserModel>>
-        get()=MatchUserList
+    private val isFavourite = MutableLiveData<Boolean>()
+    val isFavouriteResponse: LiveData<Boolean>
+        get() = isFavourite
 
-    private val getUser=MutableLiveData<UserModel>()
-    val getUserResponse:LiveData<UserModel>
-        get()=getUser
+    private val MatchUserList = MutableLiveData<List<UserModel>>()
+    val MatchUserListResponse: LiveData<List<UserModel>>
+        get() = MatchUserList
 
-    private val getChats=MutableLiveData<List<Chat>>()
-    val getChatsResponse:LiveData<List<Chat>>
-        get()=getChats
+    private val getUser = MutableLiveData<UserModel>()
+    val getUserResponse: LiveData<UserModel>
+        get() = getUser
 
-    private val fetchFavourites=MutableLiveData<List<String>>()
-    val fetchFavouritesResponse:LiveData<List<String>>
-        get()=fetchFavourites
+    private val getChatList = MutableLiveData<List<ReceiverChatList>>()
+    val chatListResponse: LiveData<List<ReceiverChatList>>
+        get() = getChatList
 
-    private val fetchPopularMovies=MutableLiveData<Resource<Movies>>()
-    val popularMoviesResponse:LiveData<Resource<Movies>>
-        get()=fetchPopularMovies
+    private val getChats = MutableLiveData<List<Chat>>()
+    val getChatsResponse: LiveData<List<Chat>>
+        get() = getChats
 
-    private val fetchTopRatedMovies=MutableLiveData<Resource<Movies>>()
-    val topRatedMoviesResponse:LiveData<Resource<Movies>>
-        get()=fetchTopRatedMovies
+    private val fetchFavourites = MutableLiveData<List<String>>()
+    val fetchFavouritesResponse: LiveData<List<String>>
+        get() = fetchFavourites
 
-    private val fetchUpcomingMovies=MutableLiveData<Resource<Movies>>()
-    val upcomingMoviesResponse:LiveData<Resource<Movies>>
-        get()=fetchUpcomingMovies
+    private val fetchPopularMovies = MutableLiveData<Resource<Movies>>()
+    val popularMoviesResponse: LiveData<Resource<Movies>>
+        get() = fetchPopularMovies
 
-    private val fetchMovieDetails=MutableLiveData<MovieDetails>()
-    val movieDetailsResponse:LiveData<MovieDetails>
-        get()=fetchMovieDetails
+    private val fetchTopRatedMovies = MutableLiveData<Resource<Movies>>()
+    val topRatedMoviesResponse: LiveData<Resource<Movies>>
+        get() = fetchTopRatedMovies
 
-    private val fetchSimilarMoviesList=MutableLiveData<Movies>()
+    private val fetchUpcomingMovies = MutableLiveData<Resource<Movies>>()
+    val upcomingMoviesResponse: LiveData<Resource<Movies>>
+        get() = fetchUpcomingMovies
 
-    val similarMovieListResponse:LiveData<Movies>
+    private val fetchMovieDetails = MutableLiveData<MovieDetails>()
+    val movieDetailsResponse: LiveData<MovieDetails>
+        get() = fetchMovieDetails
+
+    private val fetchSimilarMoviesList = MutableLiveData<Movies>()
+
+    val similarMovieListResponse: LiveData<Movies>
         get() = fetchSimilarMoviesList
 
-    private val fetchMovieCast=MutableLiveData<MovieCast>()
-    val movieCastResponse:LiveData<MovieCast>
+    private val fetchMovieCast = MutableLiveData<MovieCast>()
+    val movieCastResponse: LiveData<MovieCast>
         get() = fetchMovieCast
 
     private val fetchMovieImages = MutableLiveData<MovieImages>()
@@ -97,21 +105,19 @@ class MoviesViewModel
         getPopularMovies()
         getTopRatedMovies()
         getUpcomingMovies()
-
     }
 
-    private fun getPopularMovies(){
+    private fun getPopularMovies() {
         viewModelScope.launch {
             try {
-                fetchPopularMovies.value=Resource.loading()
+                fetchPopularMovies.value = Resource.loading()
                 val response = moviesRepository.getPopularMovies()
                 if (response.isSuccessful) {
                     fetchPopularMovies.value = Resource.success(response.body()!!)
                 } else {
                     fetchPopularMovies.value = Resource.empty()
                 }
-            }
-            catch (e:Exception){
+            } catch (e: Exception) {
                 if (e is UnknownHostException) {
                     fetchPopularMovies.value = Resource.offlineError()
                 } else {
@@ -141,7 +147,7 @@ class MoviesViewModel
         }
     }
 
-    private fun getUpcomingMovies(){
+    private fun getUpcomingMovies() {
         viewModelScope.launch {
             try {
                 fetchUpcomingMovies.value = Resource.loading()
@@ -164,70 +170,64 @@ class MoviesViewModel
     fun getMovieDetails(movieId: String) {
         viewModelScope.launch {
             moviesRepository.getMovieDetails(movieId).let { response ->
-                if(response.isSuccessful){
+                if (response.isSuccessful) {
                     fetchMovieDetails.postValue(response.body())
-                }
-                else{
-                    Log.d("MoviesViewModel","getMovieDetails: ${response.errorBody()}")
+                } else {
+                    Log.d("MoviesViewModel", "getMovieDetails: ${response.errorBody()}")
                 }
             }
         }
     }
 
-    fun getSimilarMovies(movieId:String){
+    fun getSimilarMovies(movieId: String) {
         viewModelScope.launch {
             moviesRepository.getSimilarMovies(movieId).let { response ->
-                if (response.isSuccessful){
+                if (response.isSuccessful) {
                     fetchSimilarMoviesList.postValue(response.body())
-                }
-                else{
-                    Log.d("MoviesViewModel","getSimilarMovies:${response.errorBody()}")
+                } else {
+                    Log.d("MoviesViewModel", "getSimilarMovies:${response.errorBody()}")
                 }
             }
         }
     }
 
-    fun getMovieCast(movieId:String){
+    fun getMovieCast(movieId: String) {
         viewModelScope.launch {
             moviesRepository.getMovieCast(movieId).let { response ->
-                if (response.isSuccessful){
+                if (response.isSuccessful) {
                     fetchMovieCast.postValue(response.body())
-                }
-                else{
-                    Log.d("MoviesViewModel","getMovieCast:${response.errorBody()}")
+                } else {
+                    Log.d("MoviesViewModel", "getMovieCast:${response.errorBody()}")
                 }
             }
         }
     }
 
-    fun getMovieImages(movieId: String){
+    fun getMovieImages(movieId: String) {
         viewModelScope.launch {
-            moviesRepository.getMovieImages(movieId).let {response ->
-                if(response.isSuccessful)
-                {
+            moviesRepository.getMovieImages(movieId).let { response ->
+                if (response.isSuccessful) {
                     fetchMovieImages.postValue(response.body())
-                }
-                else{
-                    Log.d("MoviesViewModel","getMovieImages:${response.errorBody()}")
+                } else {
+                    Log.d("MoviesViewModel", "getMovieImages:${response.errorBody()}")
                 }
             }
         }
     }
 
-    fun getSearchResults(search:String){
+    fun getSearchResults(search: String) {
         viewModelScope.launch {
             moviesRepository.getSearchResults(search).let { response ->
-                if (response.isSuccessful){
+                if (response.isSuccessful) {
                     fetchSearchResults.postValue(response.body())
-                }
-                else{
-                    Log.d("MoviesViewModel","getSearchResults;${response.errorBody()}")
+                } else {
+                    Log.d("MoviesViewModel", "getSearchResults;${response.errorBody()}")
                 }
             }
         }
     }
 
-    fun addToFavourites(userID:String,movieId: String) {
+    fun addToFavourites(userID: String, movieId: String) {
         viewModelScope.launch {
             val userFav = database.getReference("UserFavourites").child(userID)
             val movieFav = database.getReference("MovieFavourites").child(movieId)
@@ -252,7 +252,7 @@ class MoviesViewModel
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val currentUsers =
                         snapshot.getValue(MovieFavourites::class.java)?.userId ?: listOf()
-                    if(!currentUsers.contains(userID)) {
+                    if (!currentUsers.contains(userID)) {
                         val updatedUsers = currentUsers + userID
                         movieFav.setValue(MovieFavourites(updatedUsers))
                     }
@@ -266,7 +266,7 @@ class MoviesViewModel
         }
     }
 
-    fun removeFromFavourites(userID:String,movieId: String) {
+    fun removeFromFavourites(userID: String, movieId: String) {
         viewModelScope.launch {
             val userFav = database.getReference("UserFavourites").child(userID)
             val movieFav = database.getReference("MovieFavourites").child(movieId)
@@ -301,10 +301,14 @@ class MoviesViewModel
         }
     }
 
-    fun getFavourites(){
+    fun getFavourites() {
         viewModelScope.launch {
-            val userFav = database.getReference("UserFavourites").child(FirebaseAuth.getInstance().uid!!)
-            userFav.addListenerForSingleValueEvent(object : ValueEventListener {
+            val userFav = FirebaseAuth.getInstance().currentUser?.uid?.let {
+                database.getReference("UserFavourites").child(
+                    it
+                )
+            }
+            userFavEventListener=object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val userFavouriteModel = snapshot.getValue(UserFavouriteModel::class.java)
                     val movieIds = userFavouriteModel?.movieId ?: listOf()
@@ -314,19 +318,21 @@ class MoviesViewModel
                 override fun onCancelled(error: DatabaseError) {
                     Log.e("MoviesViewModel", "onCancelled: ${error.message}")
                 }
-            })
+            }
+
+            userFav?.addValueEventListener(userFavEventListener!!)
         }
     }
 
-    fun checkFavourites(movieId:String){
+    fun checkFavourites(movieId: String) {
         viewModelScope.launch {
-            val movieFav = database.getReference("UserFavourites").child(FirebaseAuth.getInstance().uid!!)
+            val movieFav = database.getReference("UserFavourites").child(currentUser!!)
 
             movieFav.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val userFavouriteModel = snapshot.getValue(UserFavouriteModel::class.java)
                     val movieIds = userFavouriteModel?.movieId ?: listOf()
-                    isFavourite.postValue(movieIds.contains(movieId))
+                    isFavourite.postValue(movieIds?.contains(movieId) ?: false)
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -336,7 +342,7 @@ class MoviesViewModel
         }
     }
 
-    fun getUserMatchList(movieId:String){
+    fun getUserMatchList(movieId: String) {
         viewModelScope.launch {
             val movieFav = database.getReference("MovieFavourites").child(movieId)
             movieFav.addValueEventListener(object : ValueEventListener {
@@ -345,13 +351,13 @@ class MoviesViewModel
                     val userListIds = users?.userId
 
                     if (userListIds != null) {
-                        val userList= mutableListOf<UserModel>()
-                        for(user in userListIds){
+                        val userList = mutableListOf<UserModel>()
+                        for (user in userListIds) {
                             val userId = database.getReference("Users").child(user)
-                            userId.addValueEventListener(object : ValueEventListener{
+                            userId.addValueEventListener(object : ValueEventListener {
                                 override fun onDataChange(snapshot: DataSnapshot) {
                                     val userData = snapshot.getValue(UserModel::class.java)
-                                    if(userData?.uid!= FirebaseAuth.getInstance().currentUser?.uid)
+                                    if (userData?.uid != FirebaseAuth.getInstance().currentUser?.uid)
                                         userList.add(userData!!)
                                     MatchUserList.postValue(userList)
                                 }
@@ -371,9 +377,9 @@ class MoviesViewModel
         }
     }
 
-    fun getUser(userID: String){
-        val userReference=database.getReference("Users").child(userID)
-        userReference.addValueEventListener(object : ValueEventListener{
+    fun getUser(userID: String) {
+        val userReference = database.getReference("Users").child(userID)
+        userReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val user = snapshot.getValue(UserModel::class.java)
                 getUser.postValue(user!!)
@@ -386,30 +392,37 @@ class MoviesViewModel
         })
     }
 
-    fun sendMessage(receiverId:String,message: String,url:String=""){
-        val chatReference=database.getReference("Chat")
-        val messageId= database.reference.push().key
+    fun sendMessage(receiverId: String, message: String, url: String = "") {
+        val chatReference = database.getReference("Chat")
+        val messageId = database.reference.push().key
 
         chatReference
             .child(messageId!!)
-            .setValue(Chat(FirebaseAuth.getInstance().currentUser?.uid!!,message,receiverId,false,url,messageId))
-            .addOnCompleteListener{
-                if (it.isSuccessful){
-                    val chatListReference=database.getReference("ChatList")
+            .setValue(
+                Chat(
+                    FirebaseAuth.getInstance().currentUser?.uid!!,
+                    message,
+                    receiverId,
+                    false,
+                    url,
+                    messageId
+                )
+            )
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    val chatListReference = database.getReference("ChatList")
                         .child(currentUser!!)
                         .child(receiverId)
 
                     chatListReference.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            if(!snapshot.exists()){
-                                chatListReference.child("id").setValue(receiverId)
-                            }
+                            chatListReference.child("id").setValue(ChatList(messageId,System.currentTimeMillis()))
 
-                            val chatListReceiverReference=database.getReference("ChatList")
+                            val chatListReceiverReference = database.getReference("ChatList")
                                 .child(receiverId)
                                 .child(currentUser)
 
-                            chatListReceiverReference.child("id").setValue(currentUser)
+                            chatListReceiverReference.child("id").setValue(ChatList(messageId,System.currentTimeMillis()))
                         }
 
                         override fun onCancelled(error: DatabaseError) {
@@ -418,20 +431,19 @@ class MoviesViewModel
 
                     })
 
-                    chatListReference.child("id").setValue(receiverId)
                     val reference = database.reference.child("Users").child(currentUser)
                 }
             }
     }
 
-    fun sendImageMessage(receiverId: String,data:Uri){
+    fun sendImageMessage(receiverId: String, data: Uri) {
         val storageReference = FirebaseStorage.getInstance().reference.child("Chat Image")
         val messageId = database.reference.push().key
         val filePath = storageReference.child("$messageId.png")
         val uploadTask = filePath.putFile(data)
 
-        uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot,Task<Uri>> {
-            if(!it.isSuccessful){
+        uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> {
+            if (!it.isSuccessful) {
                 it.exception?.let {
                     throw it
                 }
@@ -439,36 +451,45 @@ class MoviesViewModel
 
             return@Continuation filePath.downloadUrl
         })
-            .addOnCompleteListener{
-                if(it.isSuccessful){
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
                     val downloadUrl = it.result
-                    val url=downloadUrl.toString()
+                    val url = downloadUrl.toString()
 
-                    val chatReference=database.getReference("Chat")
-                    val messageId= database.reference.push().key
+                    val chatReference = database.getReference("Chat")
+                    val messageId = database.reference.push().key
 
                     chatReference
                         .child(messageId!!)
-                        .setValue(Chat(FirebaseAuth.getInstance().currentUser?.uid!!,"Image",receiverId,false,url,messageId))
+                        .setValue(
+                            Chat(
+                                FirebaseAuth.getInstance().currentUser?.uid!!,
+                                "Image",
+                                receiverId,
+                                false,
+                                url,
+                                messageId
+                            )
+                        )
                 }
             }
             .addOnFailureListener {
-                Log.e("ViewModel",it.message.toString())
+                Log.e("ViewModel", it.message.toString())
             }
     }
 
-    fun getChat(senderId:String,receiverId: String) {
+    fun getChat(senderId: String, receiverId: String) {
         viewModelScope.launch {
             val chatReference = database.getReference("Chat")
-            val chatList= mutableListOf<Chat>()
+            val chatList = mutableListOf<Chat>()
 
             chatReference.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     chatList.clear()
-                    for(chat in snapshot.children){
+                    for (chat in snapshot.children) {
                         val chats = chat.getValue(Chat::class.java)
 
-                        if(chat!=null && (chats?.receiver==senderId && chats?.sender==receiverId) || (chats?.receiver==receiverId && chats?.sender==senderId)){
+                        if (chat != null && (chats?.receiver == senderId && chats?.sender == receiverId) || (chats?.receiver == receiverId && chats?.sender == senderId)) {
                             chatList.add(chats!!)
                         }
                     }
@@ -480,6 +501,70 @@ class MoviesViewModel
                 }
 
             })
+        }
+
+
+    }
+
+    fun getChatList() {
+        val chatList = mutableListOf<ReceiverChatList>()
+        val chatListReference = database.getReference("ChatList").child(currentUser!!)
+        chatListEventListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (chat in snapshot.children) {
+                    val user = chat.key.toString()
+                    val message = chat.child("id").getValue(ChatList::class.java)
+                    val lastMessage = message?.id
+
+                    val userReference = database.getReference("Users").child(user)
+                    userReference.addValueEventListener(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            val userInfo = snapshot.getValue(UserModel::class.java)
+
+                            val messageReference =
+                                database.getReference("Chat").child(lastMessage!!)
+                            messageReference.addValueEventListener(object :
+                                ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    val messageInfo = snapshot.getValue(Chat::class.java)
+
+                                    val chat = ReceiverChatList(userInfo!!, messageInfo!!,message.timestamp)
+
+                                    chatList.add(chat!!)
+                                    getChatList.postValue(chatList)
+                                }
+
+                                override fun onCancelled(error: DatabaseError) {
+                                    // Handle error
+                                }
+                            })
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            TODO("Not yet implemented")
+                        }
+                    })
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        }
+
+        chatListReference.addValueEventListener(chatListEventListener!!)
+    }
+    fun removeChatListEventListener() {
+        if (chatListEventListener != null) {
+            database.getReference("ChatList").child(currentUser!!)
+                .removeEventListener(chatListEventListener!!)
+        }
+    }
+
+    fun removeFavListEventListener() {
+        if (userFavEventListener != null) {
+            database.getReference("UserFavourites").child(currentUser!!).removeEventListener(chatListEventListener!!)
         }
     }
 }

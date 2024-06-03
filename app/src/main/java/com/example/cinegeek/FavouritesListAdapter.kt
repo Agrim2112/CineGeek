@@ -14,7 +14,7 @@ import com.example.models.Result
 import kotlin.math.pow
 import kotlin.math.round
 
-class FavouritesListAdapter(private val context: Context, private val MoviesList: MutableList<MovieDetails>) : RecyclerView.Adapter<FavouritesListAdapter.ViewHolder>() {
+class FavouritesListAdapter(private val context: Context, private var MoviesList: MutableList<MovieDetails>) : RecyclerView.Adapter<FavouritesListAdapter.ViewHolder>() {
 
     lateinit var viewModel : MoviesViewModel
     class ViewHolder(binding: ItemSearchResultBinding) : RecyclerView.ViewHolder(binding.root){
@@ -30,6 +30,11 @@ class FavouritesListAdapter(private val context: Context, private val MoviesList
                 LayoutInflater.from(parent.context),parent,false
             )
         )
+    }
+
+    fun submitList(newFavourites: List<MovieDetails>) {
+        MoviesList = ArrayList(newFavourites) // Create a new list
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
