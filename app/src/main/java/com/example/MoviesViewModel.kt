@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.api.ApiService
+import com.example.api.FCMApi
 import com.example.di.Resource
 import com.example.models.Chat
 import com.example.models.ChatList
@@ -16,9 +18,14 @@ import com.example.models.MovieDetails
 import com.example.models.MovieFavourites
 import com.example.models.MovieImages
 import com.example.models.Movies
+import com.example.models.NotificationBody
 import com.example.models.ReceiverChatList
+import com.example.models.SendMessageDto
 import com.example.models.UserModel
+import com.example.models.UserToken
+import com.example.repository.FCMRepository
 import com.example.repository.MoviesRepository
+import com.example.utils.Constants
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
@@ -31,6 +38,14 @@ import com.google.firebase.storage.StorageTask
 import com.google.firebase.storage.UploadTask
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.create
+import java.io.OutputStreamWriter
+import java.net.HttpURLConnection
+import java.net.URL
 import java.net.UnknownHostException
 import javax.inject.Inject
 
@@ -42,6 +57,7 @@ class MoviesViewModel
     val myRef = database.getReference("favourites")
     private var chatListEventListener: ValueEventListener? = null
     private var userFavEventListener:ValueEventListener? = null
+
 
     private val isFavourite = MutableLiveData<Boolean>()
     val isFavouriteResponse: LiveData<Boolean>
@@ -381,7 +397,7 @@ class MoviesViewModel
         val userReference = database.getReference("Users").child(userID)
         userReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val user = snapshot.getValue(UserModel::class.java)
+                val user = snapshot.getValue(UserModel::class.java)!!
                 getUser.postValue(user!!)
             }
 
@@ -395,6 +411,35 @@ class MoviesViewModel
     fun sendMessage(receiverId: String, message: String, url: String = "") {
         val chatReference = database.getReference("Chat")
         val messageId = database.reference.push().key
+        val tokenReference = database.getReference("UserTokens").child(receiverId)
+
+//        val userReference = database.getReference("Users").child(currentUser!!)
+//        userReference.addValueEventListener(object : ValueEventListener {
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                usernameCurrent = snapshot.getValue(UserModel::class.java)!!
+//            }
+//
+//            override fun onCancelled(error: DatabaseError) {
+//                Log.e("MoviesViewModel", "onCancelled: ${error.message}")
+//            }
+//
+//        })
+        tokenReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val token = snapshot.getValue(String::class.java)
+                Log.d("token",token!!)
+//                viewModelScope.launch {
+//
+//                    val pushMessage=SendMessageDto(token, NotificationBody("Agrim Gupta",message))
+//                    fcmRepository.sendMessage(pushMessage)
+//                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+        })
+
 
         chatReference
             .child(messageId!!)
@@ -512,6 +557,7 @@ class MoviesViewModel
         chatListEventListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (chat in snapshot.children) {
+                    chatList.clear()
                     val user = chat.key.toString()
                     val message = chat.child("id").getValue(ChatList::class.java)
                     val lastMessage = message?.id
@@ -528,7 +574,15 @@ class MoviesViewModel
                                 override fun onDataChange(snapshot: DataSnapshot) {
                                     val messageInfo = snapshot.getValue(Chat::class.java)
 
-                                    val chat = ReceiverChatList(userInfo!!, messageInfo!!,message.timestamp)
+                                    val chatsToRemove = mutableListOf<ReceiverChatList>()
+                                    for(ch in chatList){
+                                        if (ch.userInfo == userInfo){
+                                            chatsToRemove.add(ch)
+                                        }
+                                    }
+                                    chatList.removeAll(chatsToRemove)
+
+                                    val chat = ReceiverChatList(userInfo!!, messageInfo!!, message.timestamp)
 
                                     chatList.add(chat!!)
                                     getChatList.postValue(chatList)
@@ -561,6 +615,7 @@ class MoviesViewModel
                 .removeEventListener(chatListEventListener!!)
         }
     }
+
 
     fun removeFavListEventListener() {
         if (userFavEventListener != null) {

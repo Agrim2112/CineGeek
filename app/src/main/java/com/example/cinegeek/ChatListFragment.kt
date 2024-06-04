@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.MoviesViewModel
 import com.example.cinegeek.databinding.FragmentChatListBinding
+import com.example.models.ReceiverChatList
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -48,10 +49,10 @@ class ChatListFragment : Fragment() {
         viewModel.removeChatListEventListener()
     }
 
+
     override fun onResume() {
         super.onResume()
 
-        // Refresh the chat list
         viewModel.getChatList()
     }
 }
