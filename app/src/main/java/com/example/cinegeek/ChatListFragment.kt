@@ -35,7 +35,12 @@ class ChatListFragment : Fragment() {
     private fun setObservers() {
         viewModel.chatListResponse.observe(viewLifecycleOwner){
             if(it!=null){
-                var chatList=it
+                var chatList = if (it.isNotEmpty()) {
+                    it
+                } else {
+                    mutableListOf()
+                }
+                if(chatList.isNotEmpty())
                 chatList=chatList.sortedByDescending{ it.timestamp }
                 binding?.rvChat?.layoutManager=LinearLayoutManager(context)
                 val chatListAdapter = ChatListAdapter(requireContext(), chatList as MutableList)

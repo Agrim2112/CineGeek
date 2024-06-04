@@ -53,17 +53,17 @@ class ChatActivity : AppCompatActivity() {
             onBackPressed()
         }
 
+
         binding?.etMessage?.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-                // No action needed here
             }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                // No action needed here
             }
 
             override fun afterTextChanged(s: Editable) {
                 if (s.toString().isEmpty()) {
+                    viewModel.setTyping(false,receiverId)
                     binding?.ivCamera?.isEnabled = true
                     binding?.tvSend?.isEnabled = false
                     binding?.ivCamera?.setColorFilter(
@@ -79,6 +79,7 @@ class ChatActivity : AppCompatActivity() {
                         )
                     )
                 } else {
+                    viewModel.setTyping(true,receiverId)
                     binding?.tvSend?.isEnabled = true
                     binding?.ivCamera?.isEnabled = false
                     binding?.ivCamera?.setColorFilter(

@@ -4,5 +4,5 @@ import com.google.firebase.Timestamp
 
 data class ChatList(
     val id: String="",
-    val timestamp: Long=0
+    val timestamp: Long=0,
 )

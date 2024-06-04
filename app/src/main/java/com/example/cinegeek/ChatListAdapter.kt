@@ -63,15 +63,18 @@ class ChatListAdapter(private val context: Context, private var chatList: Mutabl
         }
 
 
-        val trimmedMessage = if (model.chatInfo.message.length > 40) {
-            model.chatInfo.message.substring(0, 36) + "..."
-        } else {
-            model.chatInfo.message
+        var trimmedMessage="Typing..."
+        if(model.typing==false) {
+            trimmedMessage = if (model.chatInfo.message.length > 40) {
+                model.chatInfo.message.substring(0, 36) + "..."
+            } else {
+                model.chatInfo.message
+            }
         }
 
         holder?.chat?.text= trimmedMessage
 
-        if(model?.chatInfo?.receiver==FirebaseAuth.getInstance().currentUser?.uid!! && model.chatInfo.seen==false){
+        if(model?.chatInfo?.receiver==FirebaseAuth.getInstance().currentUser?.uid!! && model.chatInfo.seen==false || model.typing==true){
             holder?.chat?.typeface=typeface
             holder?.chat?.setTextColor(
                 ContextCompat.getColor(

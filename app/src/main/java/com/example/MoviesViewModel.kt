@@ -461,13 +461,10 @@ class MoviesViewModel
 
                     chatListReference.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
+                            if(!snapshot.exists()){
+                                chatListReference.child("isTyping").setValue(false)
+                            }
                             chatListReference.child("id").setValue(ChatList(messageId,System.currentTimeMillis()))
-
-                            val chatListReceiverReference = database.getReference("ChatList")
-                                .child(receiverId)
-                                .child(currentUser)
-
-                            chatListReceiverReference.child("id").setValue(ChatList(messageId,System.currentTimeMillis()))
                         }
 
                         override fun onCancelled(error: DatabaseError) {
@@ -475,6 +472,24 @@ class MoviesViewModel
                         }
 
                     })
+
+                    val chatListReceiverReference = database.getReference("ChatList")
+                        .child(receiverId)
+                        .child(currentUser)
+                    chatListReceiverReference.addListenerForSingleValueEvent(object:ValueEventListener{
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if(!snapshot.exists()){
+                                chatListReceiverReference.child("isTyping").setValue(false)
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            TODO("Not yet implemented")
+                        }
+
+                    })
+
+                    chatListReceiverReference.child("id").setValue(ChatList(messageId,System.currentTimeMillis()))
 
                     val reference = database.reference.child("Users").child(currentUser)
                 }
@@ -560,6 +575,8 @@ class MoviesViewModel
                     chatList.clear()
                     val user = chat.key.toString()
                     val message = chat.child("id").getValue(ChatList::class.java)
+                    val isTyping = chat.child("isTyping").getValue(Boolean::class.java)
+                    Log.d("isTyping",isTyping.toString())
                     val lastMessage = message?.id
 
                     val userReference = database.getReference("Users").child(user)
@@ -582,7 +599,7 @@ class MoviesViewModel
                                     }
                                     chatList.removeAll(chatsToRemove)
 
-                                    val chat = ReceiverChatList(userInfo!!, messageInfo!!, message.timestamp)
+                                    val chat = ReceiverChatList(userInfo!!, messageInfo!!, message.timestamp,isTyping!!)
 
                                     chatList.add(chat!!)
                                     getChatList.postValue(chatList)
@@ -621,5 +638,22 @@ class MoviesViewModel
         if (userFavEventListener != null) {
             database.getReference("UserFavourites").child(currentUser!!).removeEventListener(chatListEventListener!!)
         }
+    }
+
+
+    fun setTyping(isTyping:Boolean,receiverId: String){
+        val chatReference = database.getReference("ChatList").child(receiverId).child(currentUser!!)
+        chatReference.addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()){
+                    chatReference.child("isTyping").setValue(isTyping)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        })
     }
 }
