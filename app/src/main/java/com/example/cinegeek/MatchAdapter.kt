@@ -4,6 +4,7 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.MoviesViewModel
 import com.example.cinegeek.databinding.ItemProfileBinding
 import com.example.models.UserModel
@@ -38,6 +39,12 @@ class MatchAdapter(private val context: Context, private val UserList: MutableLi
             model.name.substring(0, 24) + "..."
         } else {
             model.name
+        }
+
+        if(model.pfp.isNotEmpty()){
+            Glide.with(context)
+                .load(model.pfp)
+                .into(holder.profilePic)
         }
 
         holder?.name?.text=trimmedText

@@ -123,7 +123,7 @@ class SignUpActivity : AppCompatActivity() {
                     if(it.isSuccessful)
                     {
                         val databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseAuth!!.uid!!)
-                        databaseReference.setValue(UserModel(name,user,email,"",firebaseAuth!!.uid!!))
+                        databaseReference.setValue(UserModel(name,user,email,"",firebaseAuth!!.uid!!,""))
                         val intent=Intent(this, DashboardActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)

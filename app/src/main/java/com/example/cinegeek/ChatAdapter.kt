@@ -3,6 +3,7 @@ package com.example.cinegeek
 import android.content.Context
 import android.content.Intent
 import android.renderscript.ScriptGroup.Binding
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -59,10 +60,18 @@ class ChatAdapter(private val context: Context, private val chatList: MutableLis
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val model = chatList[position]
 
+        Log.d("URL",imageUrl)
+
         onMessageSeen(model)
 
         if(model==lastSeenMessage){
             holder?.seen?.visibility=View.VISIBLE
+        }
+
+        if (context != null && imageUrl != null && holder.profilePic != null && imageUrl.isNotEmpty()) {
+            Glide.with(context)
+                .load(imageUrl)
+                .into(holder.profilePic)
         }
 
         if(model.message.equals("Image") && !model.url.equals("")){

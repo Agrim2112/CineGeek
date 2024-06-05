@@ -51,10 +51,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MoviesViewModel
-@Inject constructor(private val moviesRepository: MoviesRepository): ViewModel() {
+@Inject constructor(private val moviesRepository: MoviesRepository, private val fcmRepository:FCMRepository): ViewModel() {
     val currentUser = FirebaseAuth.getInstance().currentUser?.uid
     val database = FirebaseDatabase.getInstance()
     val myRef = database.getReference("favourites")
+    var userName =""
     private var chatListEventListener: ValueEventListener? = null
     private var userFavEventListener:ValueEventListener? = null
 
@@ -413,32 +414,34 @@ class MoviesViewModel
         val messageId = database.reference.push().key
         val tokenReference = database.getReference("UserTokens").child(receiverId)
 
-//        val userReference = database.getReference("Users").child(currentUser!!)
-//        userReference.addValueEventListener(object : ValueEventListener {
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                usernameCurrent = snapshot.getValue(UserModel::class.java)!!
-//            }
-//
-//            override fun onCancelled(error: DatabaseError) {
-//                Log.e("MoviesViewModel", "onCancelled: ${error.message}")
-//            }
-//
-//        })
-        tokenReference.addValueEventListener(object : ValueEventListener {
+        val userReference = database.getReference("Users").child(currentUser!!)
+        userReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val token = snapshot.getValue(String::class.java)
-                Log.d("token",token!!)
-//                viewModelScope.launch {
-//
-//                    val pushMessage=SendMessageDto(token, NotificationBody("Agrim Gupta",message))
-//                    fcmRepository.sendMessage(pushMessage)
-//                }
+                val usernameCurrent = snapshot.getValue(UserModel::class.java)!!
+                userName=usernameCurrent?.name!!
+                tokenReference.addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val token = snapshot.getValue(String::class.java)
+                        Log.d("token",token!!)
+                        viewModelScope.launch {
+
+                            val pushMessage=SendMessageDto(token, NotificationBody(userName,message))
+                            fcmRepository.sendMessage(pushMessage)
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        TODO("Not yet implemented")
+                    }
+                })
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+                Log.e("MoviesViewModel", "onCancelled: ${error.message}")
             }
+
         })
+
 
 
         chatReference
@@ -655,5 +658,35 @@ class MoviesViewModel
             }
 
         })
+    }
+
+    fun addPfp(data: Uri) {
+        val storageReference = FirebaseStorage.getInstance().reference.child("User Profile")
+        val messageId = database.reference.push().key
+        val filePath = storageReference.child("$messageId.png")
+        val uploadTask = filePath.putFile(data)
+
+        uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> {
+            if (!it.isSuccessful) {
+                it.exception?.let {
+                    throw it
+                }
+            }
+
+            return@Continuation filePath.downloadUrl
+        })
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    val downloadUrl = it.result
+                    val url = downloadUrl.toString()
+
+                    val userReference = database.getReference("Users").child(currentUser!!)
+                    userReference.child("pfp").setValue(url)
+
+                }
+            }
+            .addOnFailureListener {
+                Log.e("ViewModel", it.message.toString())
+            }
     }
 }

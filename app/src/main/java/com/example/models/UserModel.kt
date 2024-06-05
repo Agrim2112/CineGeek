@@ -4,6 +4,7 @@ data class UserModel(
     val name:String="",
     val username: String="",
     val email: String="",
-    val pfp: String="",
-    val uid: String=""
+    var pfp: String="",
+    val uid: String="",
+    val bio:String=""
 )

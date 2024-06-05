@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.MoviesViewModel
 import com.example.cinegeek.databinding.ActivityChatBinding
 import com.example.models.Chat
@@ -33,7 +34,7 @@ class ChatActivity : AppCompatActivity() {
     lateinit var viewModel : MoviesViewModel
     private  lateinit var binding: ActivityChatBinding
     lateinit var receiverId : String
-    var profilePic : String?=null
+    lateinit var profilePic : String
     lateinit var chatList:MutableList<Chat>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,9 +121,14 @@ class ChatActivity : AppCompatActivity() {
             {
                 binding?.tvReceiver?.text=it.name
                 profilePic=it.pfp
+                if (profilePic.isNotEmpty()){
+                    Glide.with(this)
+                        .load(profilePic)
+                        .into(binding.ivProfilePic)
+                }
             }
-        }
 
+        }
         viewModel.getChatsResponse.observe(this){
             if (it!=null)
             {
@@ -135,16 +141,11 @@ class ChatActivity : AppCompatActivity() {
                         chat ->
                     val currentUser=FirebaseAuth.getInstance().currentUser?.uid!!
                     if (chat.sender != currentUser && !chat.seen) {
-                        // The current user is the receiver of the message and the message has not been seen
-                        // Update the seen field in the database
                         val chatReference = FirebaseDatabase.getInstance().getReference("Chat")
                         chatReference.child(chat.messageId).child("seen").setValue(true)
                     }
                 }
                 binding?.rvChats?.adapter=chatAdapter
-//                binding?.rvChats?.post {
-//                    binding?.rvChats?.scrollToPosition(chatList.size - 1)
-//                }
                 chatAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
                     override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                         binding?.rvChats?.post {
@@ -154,6 +155,8 @@ class ChatActivity : AppCompatActivity() {
                 })
             }
         }
+
+
     }
 
 

@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.MoviesViewModel
 import com.example.cinegeek.databinding.ItemCastBinding
 import com.example.cinegeek.databinding.ItemChatListBinding
@@ -47,6 +48,11 @@ class ChatListAdapter(private val context: Context, private var chatList: Mutabl
 
         val model = chatList[position]
 
+        if(model.userInfo.pfp.isNotEmpty()){
+            Glide.with(context)
+                .load(model.userInfo.pfp)
+                .into(holder.profilePic)
+        }
 
         val trimmedName = if (model.userInfo.name.length > 40) {
             model.userInfo.name.substring(0, 36) + "..."
