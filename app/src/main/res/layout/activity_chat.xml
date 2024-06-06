@@ -24,8 +24,7 @@ tools:context=".ChatActivity">
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/blue"
-        android:orientation="horizontal"
-        android:paddingVertical="15dp">
+        android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/btnBack"
@@ -35,6 +34,12 @@ tools:context=".ChatActivity">
             android:layout_marginStart="5dp"
             android:src="@drawable/back_arrow" />
 
+        <LinearLayout
+            android:id="@+id/llViewProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="15dp"
+            android:orientation="horizontal">
         <com.makeramen.roundedimageview.RoundedImageView
             android:id="@+id/ivProfilePic"
             android:layout_width="39dp"
@@ -68,6 +73,7 @@ tools:context=".ChatActivity">
                 android:text="Tap for details"
                 android:textColor="#B6B6B6"
                 android:textSize="13sp" />
+        </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

@@ -1,5 +1,8 @@
 package com.example.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 data class MovieDetails(
     val adult: Boolean,
     val backdrop_path: String,

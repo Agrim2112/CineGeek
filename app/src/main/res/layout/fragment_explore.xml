@@ -90,7 +90,7 @@
                     android:layout_marginBottom="24dp"
                     android:fontFamily="@font/nunito_sans_bold"
                     android:text="Popular Movies"
-                    android:textColor="@color/yellow"
+                    android:textColor="@color/cyan"
                     android:textSize="18sp" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -116,7 +116,7 @@
                     android:layout_marginBottom="24dp"
                     android:fontFamily="@font/nunito_sans_bold"
                     android:text="Top Rated"
-                    android:textColor="@color/yellow"
+                    android:textColor="@color/cyan"
                     android:textSize="18sp" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -142,7 +142,7 @@
                     android:layout_marginBottom="24dp"
                     android:fontFamily="@font/nunito_sans_bold"
                     android:text="Upcoming Movies"
-                    android:textColor="@color/yellow"
+                    android:textColor="@color/cyan"
                     android:textSize="18sp" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout

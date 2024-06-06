@@ -84,6 +84,10 @@ class MoviesViewModel
     val fetchFavouritesResponse: LiveData<List<String>>
         get() = fetchFavourites
 
+    private val fetchCommonFavourites = MutableLiveData<List<String>>()
+    val fetchCommonFavouritesResponse: LiveData<List<String>>
+        get() = fetchCommonFavourites
+
     private val fetchPopularMovies = MutableLiveData<Resource<Movies>>()
     val popularMoviesResponse: LiveData<Resource<Movies>>
         get() = fetchPopularMovies
@@ -99,6 +103,10 @@ class MoviesViewModel
     private val fetchMovieDetails = MutableLiveData<MovieDetails>()
     val movieDetailsResponse: LiveData<MovieDetails>
         get() = fetchMovieDetails
+
+    private val fetchCommonMovieDetails = MutableLiveData<MovieDetails>()
+    val commonMoviesDetailsResponse: LiveData<MovieDetails>
+        get() = fetchCommonMovieDetails
 
     private val fetchSimilarMoviesList = MutableLiveData<Movies>()
 
@@ -195,6 +203,19 @@ class MoviesViewModel
             }
         }
     }
+
+    fun getCommonMovieDetails(movieId: String) {
+        viewModelScope.launch {
+            moviesRepository.getMovieDetails(movieId).let { response ->
+                if (response.isSuccessful) {
+                    fetchCommonMovieDetails.postValue(response.body())
+                } else {
+                    Log.d("MoviesViewModel", "getMovieDetails: ${response.errorBody()}")
+                }
+            }
+        }
+    }
+
 
     fun getSimilarMovies(movieId: String) {
         viewModelScope.launch {
@@ -318,18 +339,33 @@ class MoviesViewModel
         }
     }
 
-    fun getFavourites() {
+    fun getFavourites(userID: String) {
         viewModelScope.launch {
-            val userFav = FirebaseAuth.getInstance().currentUser?.uid?.let {
-                database.getReference("UserFavourites").child(
-                    it
-                )
-            }
+            val userFav = database.getReference("UserFavourites").child(userID)
             userFavEventListener=object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val userFavouriteModel = snapshot.getValue(UserFavouriteModel::class.java)
                     val movieIds = userFavouriteModel?.movieId ?: listOf()
                     fetchFavourites.postValue(movieIds)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("MoviesViewModel", "onCancelled: ${error.message}")
+                }
+            }
+
+            userFav?.addValueEventListener(userFavEventListener!!)
+        }
+    }
+
+    fun getCommonFavourites(userID: String) {
+        viewModelScope.launch {
+            val userFav = database.getReference("UserFavourites").child(userID)
+            userFavEventListener=object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val userFavouriteModel = snapshot.getValue(UserFavouriteModel::class.java)
+                    val movieIds = userFavouriteModel?.movieId ?: listOf()
+                    fetchCommonFavourites.postValue(movieIds)
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -594,18 +630,25 @@ class MoviesViewModel
                                 override fun onDataChange(snapshot: DataSnapshot) {
                                     val messageInfo = snapshot.getValue(Chat::class.java)
 
-                                    val chatsToRemove = mutableListOf<ReceiverChatList>()
-                                    for(ch in chatList){
-                                        if (ch.userInfo == userInfo){
-                                            chatsToRemove.add(ch)
+                                    if (messageInfo != null) {
+                                        val chatsToRemove = mutableListOf<ReceiverChatList>()
+                                        for (ch in chatList) {
+                                            if (ch.userInfo == userInfo) {
+                                                chatsToRemove.add(ch)
+                                            }
                                         }
+                                        chatList.removeAll(chatsToRemove)
+
+                                        val chat = ReceiverChatList(
+                                            userInfo!!,
+                                            messageInfo!!,
+                                            message.timestamp,
+                                            isTyping!!
+                                        )
+
+                                        chatList.add(chat!!)
+                                        getChatList.postValue(chatList)
                                     }
-                                    chatList.removeAll(chatsToRemove)
-
-                                    val chat = ReceiverChatList(userInfo!!, messageInfo!!, message.timestamp,isTyping!!)
-
-                                    chatList.add(chat!!)
-                                    getChatList.postValue(chatList)
                                 }
 
                                 override fun onCancelled(error: DatabaseError) {

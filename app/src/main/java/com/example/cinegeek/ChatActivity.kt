@@ -54,6 +54,12 @@ class ChatActivity : AppCompatActivity() {
             onBackPressed()
         }
 
+        binding?.llViewProfile?.setOnClickListener(){
+            val intent= Intent(this,ViewProfileActivity::class.java)
+            intent.putExtra("receiverId",receiverId)
+            startActivity(intent)
+        }
+
 
         binding?.etMessage?.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {

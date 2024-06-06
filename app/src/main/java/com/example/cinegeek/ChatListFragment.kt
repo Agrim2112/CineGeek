@@ -41,7 +41,7 @@ class ChatListFragment : Fragment() {
                     mutableListOf()
                 }
                 if(chatList.isNotEmpty())
-                chatList=chatList.sortedByDescending{ it.timestamp }
+                    chatList=chatList.sortedByDescending{ it.timestamp }
                 binding?.rvChat?.layoutManager=LinearLayoutManager(context)
                 val chatListAdapter = ChatListAdapter(requireContext(), chatList as MutableList)
                 binding?.rvChat?.adapter = chatListAdapter

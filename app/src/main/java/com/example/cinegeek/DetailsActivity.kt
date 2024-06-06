@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -52,6 +53,8 @@ class DetailsActivity : AppCompatActivity() {
         viewModel.getMovieImages(movieId!!)
         viewModel.checkFavourites(movieId!!)
 
+
+
         binding?.llMatch?.setOnClickListener(){
             val intent= Intent(this,MatchActivity::class.java)
             intent.putExtra("movieId",movieId)
@@ -62,11 +65,16 @@ class DetailsActivity : AppCompatActivity() {
             if(isChecked) {
                 FirebaseAuth.getInstance().currentUser?.let { currentUser ->
                     viewModel.addToFavourites(currentUser.uid, movieId)
+                        binding?.llMatch?.isEnabled=true
+                        binding?.llMatch?.setBackgroundResource(R.drawable.bg)
+
                 }
             }
             else
                 FirebaseAuth.getInstance().currentUser?.let { currentUser ->
                     viewModel.removeFromFavourites(currentUser.uid, movieId)
+                        binding?.llMatch?.isEnabled=false
+                        binding?.llMatch?.setBackgroundResource(R.drawable.grey_bg)
                 }
         }
 
@@ -80,6 +88,10 @@ class DetailsActivity : AppCompatActivity() {
             {
                 isFavourite=it
                 binding?.favoriteButton?.isChecked=isFavourite
+                if(binding?.favoriteButton?.isChecked == false){
+                    binding?.llMatch?.isEnabled=false
+                    binding?.llMatch?.setBackgroundResource(R.drawable.grey_bg)
+                }
             }
         }
         viewModel.similarMovieListResponse.observe(this) {

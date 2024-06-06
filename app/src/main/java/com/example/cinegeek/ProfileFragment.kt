@@ -60,6 +60,7 @@ class ProfileFragment : Fragment() {
             if(it!=null){
                 binding?.tvEmail?.text=it.email
                 binding?.tvName?.text=it.name
+                binding?.tvBio?.text=it.bio
                 val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                 binding?.tvJoinedOn?.text=sdf.format(FirebaseAuth.getInstance().currentUser?.metadata?.creationTimestamp).toString()
                 binding?.tvUsername?.text="@"+it.username

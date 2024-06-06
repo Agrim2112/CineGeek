@@ -22,6 +22,7 @@ class FavouritesFragment : Fragment() {
     private val binding get() = _binding!!
     lateinit var viewModel : MoviesViewModel
     private var Movies : List<MovieDetails> = mutableListOf()
+    private lateinit var currentUser:String
     private var FavouritesList : List<String>?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,10 +35,12 @@ class FavouritesFragment : Fragment() {
         _binding = FragmentFavouritesBinding.inflate(inflater, container, false)
         val view = binding.root
 
+        currentUser=FirebaseAuth.getInstance().currentUser?.uid!!
+
         viewModel = ViewModelProvider(this)[MoviesViewModel::class.java]
 
         setObservers()
-        viewModel.getFavourites()
+        viewModel.getFavourites(currentUser)
         viewModel.getChatList()
 
         return view
@@ -71,7 +74,7 @@ class FavouritesFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.getFavourites()
+        viewModel.getFavourites(currentUser)
     }
     override fun onStop() {
         super.onStop()

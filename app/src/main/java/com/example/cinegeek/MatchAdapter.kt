@@ -50,7 +50,7 @@ class MatchAdapter(private val context: Context, private val UserList: MutableLi
         holder?.name?.text=trimmedText
 
         holder.itemView.setOnClickListener{
-            val intent= Intent(context,ChatActivity::class.java)
+            val intent= Intent(context,ViewProfileActivity::class.java)
             intent.putExtra("receiverId",model.uid)
             context.startActivity(intent)
         }
