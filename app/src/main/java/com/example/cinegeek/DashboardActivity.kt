@@ -15,17 +15,25 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import android.Manifest
+import androidx.lifecycle.ViewModelProvider
+import com.example.MoviesViewModel
 
 @AndroidEntryPoint
 class DashboardActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDashboardBinding
+    lateinit var viewModel : MoviesViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDashboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        viewModel = ViewModelProvider(this)[MoviesViewModel::class.java]
+
+
+        Log.d("current uid", viewModel.signUpResponse?.value?.uid.toString())
         askNotificationPermission()
-        tokenGeneration()
+//        tokenGeneration()
         replaceFragment(ExploreFragment())
+
 
         binding.bottomnavbar.setOnItemSelectedListener { item ->
             if (item.itemId == R.id.explore) replaceFragment(ExploreFragment())
@@ -36,22 +44,22 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
-    private fun tokenGeneration() {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.d("token", "Fetching FCM registration token failed", task.exception)
-                return@OnCompleteListener
-            }
-
-            // Get new FCM registration token
-            val token = task.result
-            Log.d("token", token.toString())
-            val database = FirebaseDatabase.getInstance()
-            val tokenReference = database.getReference("UserTokens")
-                .child(FirebaseAuth.getInstance().currentUser?.uid!!)
-            tokenReference.setValue(token.toString())
-        })
-    }
+//    private fun tokenGeneration() {
+//        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+//            if (!task.isSuccessful) {
+//                Log.d("token", "Fetching FCM registration token failed", task.exception)
+//                return@OnCompleteListener
+//            }
+//
+//            // Get new FCM registration token
+//            val token = task.result
+//            Log.d("token", token.toString())
+//            val database = FirebaseDatabase.getInstance()
+//            val tokenReference = database.getReference("UserTokens")
+//                .child(FirebaseAuth.getInstance().currentUser?.uid!!)
+//            tokenReference.setValue(token.toString())
+//        })
+//    }
 
     private fun replaceFragment(fragment: Fragment) {
         val fragmentManager = supportFragmentManager

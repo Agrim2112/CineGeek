@@ -1,5 +1,7 @@
 package com.example
 
+import android.content.Context
+import android.content.Context.*
 import android.net.Uri
 import android.os.Message
 import android.util.Log
@@ -10,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.api.ApiService
 import com.example.api.FCMApi
 import com.example.di.Resource
+import com.example.models.ApiResponse
 import com.example.models.Chat
 import com.example.models.ChatList
 import com.example.models.UserFavouriteModel
@@ -39,13 +42,6 @@ import com.google.firebase.storage.UploadTask
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.create
-import java.io.OutputStreamWriter
-import java.net.HttpURLConnection
-import java.net.URL
 import java.net.UnknownHostException
 import javax.inject.Inject
 
@@ -59,6 +55,8 @@ class MoviesViewModel
     private var chatListEventListener: ValueEventListener? = null
     private var userFavEventListener:ValueEventListener? = null
 
+
+    val errorMessage = MutableLiveData<String>()
 
     private val isFavourite = MutableLiveData<Boolean>()
     val isFavouriteResponse: LiveData<Boolean>
@@ -79,6 +77,10 @@ class MoviesViewModel
     private val getChats = MutableLiveData<List<Chat>>()
     val getChatsResponse: LiveData<List<Chat>>
         get() = getChats
+
+    private val signUp = MutableLiveData<ApiResponse>()
+    val signUpResponse: LiveData<ApiResponse>
+        get() = signUp
 
     private val fetchFavourites = MutableLiveData<List<String>>()
     val fetchFavouritesResponse: LiveData<List<String>>
@@ -132,6 +134,31 @@ class MoviesViewModel
         getUpcomingMovies()
     }
 
+
+    fun signUp(userModel: UserModel) {
+        viewModelScope.launch {
+            try {
+                val response = fcmRepository.signUp(userModel)
+                when (response.code()) {
+                    201 -> {
+                        val uid = response.body()?.uid
+                        Log.d("Sign Up",uid!!)
+                        signUp.postValue(response.body())
+                    }
+                    400 -> {
+                        val errorJson = JSONObject(response.errorBody()?.string())
+                        val error = errorJson.getString("error")
+                        Log.d("Sign Up",error)
+                        errorMessage.postValue(error)
+                    }
+                    else -> {
+                    }
+                }
+            } catch (e: Exception) {
+                Log.d("Server Error", e.message.toString())
+            }
+        }
+    }
     private fun getPopularMovies() {
         viewModelScope.launch {
             try {
@@ -462,7 +489,7 @@ class MoviesViewModel
                         viewModelScope.launch {
 
                             val pushMessage=SendMessageDto(token, NotificationBody(userName,message))
-                            fcmRepository.sendMessage(pushMessage)
+//                            fcmRepository.sendMessage(pushMessage)
                         }
                     }
 
