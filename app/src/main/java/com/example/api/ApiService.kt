@@ -50,3 +50,4 @@ interface ApiService {
     suspend fun getSearchResults(@Query("query") search: String
     ):Response<Movies>
 }
+

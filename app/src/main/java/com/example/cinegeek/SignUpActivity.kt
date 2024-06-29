@@ -8,6 +8,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import com.example.MoviesViewModel
 import com.example.cinegeek.databinding.ActivitySignUpBinding
 import com.example.models.UserModel
 import com.facebook.AccessToken
@@ -27,18 +29,24 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.database.FirebaseDatabase
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.Arrays
 
 
+@AndroidEntryPoint
 class SignUpActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignUpBinding
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var callbackManager: CallbackManager
+    lateinit var viewModel : MoviesViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding=ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        viewModel = ViewModelProvider(this)[MoviesViewModel::class.java]
 
         binding?.ivTwitter?.setOnClickListener() {
             val provider = OAuthProvider.newBuilder("twitter.com")
@@ -119,20 +127,36 @@ class SignUpActivity : AppCompatActivity() {
 
             if(email.isNotEmpty() && pwd.isNotEmpty() && user.isNotEmpty() && name.isNotEmpty())
             {
-                firebaseAuth.createUserWithEmailAndPassword(email,pwd).addOnCompleteListener {
-                    if(it.isSuccessful)
-                    {
-                        val databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseAuth!!.uid!!)
-                        databaseReference.setValue(UserModel(name,user,email,"",firebaseAuth!!.uid!!,""))
+                viewModel.signUp(UserModel(name,user,email,"","jfnfjfa","", pwd))
+
+                viewModel.signUpResponse.observe(this) {
+                    if (it!=null){
                         val intent=Intent(this, DashboardActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
                     }
-                    else
-                    {
-                        Toast.makeText(this, it.exception.toString(), Toast.LENGTH_SHORT).show()
+                }
+
+                viewModel.errorMessage.observe(this) {
+                    if (it != null) {
+                        Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
                     }
                 }
+
+//                firebaseAuth.createUserWithEmailAndPassword(email,pwd).addOnCompleteListener {
+//                    if(it.isSuccessful)
+//                    {
+//                        val databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseAuth!!.uid!!)
+//                        databaseReference.setValue(UserModel(name,user,email,"",firebaseAuth!!.uid!!,""))
+//                        val intent=Intent(this, DashboardActivity::class.java)
+//                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//                        startActivity(intent)
+//                    }
+//                    else
+//                    {
+//                        Toast.makeText(this, it.exception.toString(), Toast.LENGTH_SHORT).show()
+//                    }
+//                }
             }
             else{
                 Toast.makeText(this,"Please fill all the fields",Toast.LENGTH_SHORT).show()

@@ -6,5 +6,6 @@ data class UserModel(
     val email: String="",
     var pfp: String="",
     val uid: String="",
-    val bio:String=""
+    val bio:String="",
+    val password:String=""
 )
